@@ -1,12 +1,18 @@
 # Barcode Scanner
 
-A flutter plugin for scanning 2D barcodes and QR codes
+A flutter plugin for scanning 2D barcodes and QR codes. 
+
+This provides a simple wrapper for two commonly used iOS and Android libraries:
+
+iOS: https://github.com/mikebuss/MTBBarcodeScanner
+Android: https://github.com/dm77/barcodescanner
 
 ### Features
 - [x] Scan 2D barcodes
 - [x] Scan QR codes
 - [x] Control the flash while scanning
 - [ ] Customize the permission request text
+- [ ] Support multiple barcode libraries
 
 ## Getting Started
 
