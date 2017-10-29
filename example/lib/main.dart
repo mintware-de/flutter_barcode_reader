@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan/barcode_scanner.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future scan() async {
-    String barcode = await BarcodeScan.scan();
+    String barcode = await BarcodeScanner.scan();
     setState(() => this.barcode = barcode);
   }
 }
