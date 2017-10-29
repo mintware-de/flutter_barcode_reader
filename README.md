@@ -5,6 +5,7 @@ A flutter plugin for scanning 2D barcodes and QR codes.
 This provides a simple wrapper for two commonly used iOS and Android libraries:
 
 iOS: https://github.com/mikebuss/MTBBarcodeScanner
+
 Android: https://github.com/dm77/barcodescanner
 
 ### Features
