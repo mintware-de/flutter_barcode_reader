@@ -2,3 +2,7 @@
 
 * Supports 2D & QR Codes
 * Control flash while scanning
+
+## [0.0.2] - 11/7/17
+
+* Rewrite iOS scanner in Objective-C to avoid Swift use_frameworks! conflicts with other plugins (see https://github.com/flutter/flutter/issues/10968)
