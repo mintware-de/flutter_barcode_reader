@@ -17,7 +17,7 @@ Android: https://github.com/dm77/barcodescanner
 
 ## Getting Started
 
-###Android
+### Android
 For Android, you must do the following before you can use the plugin:
 
 * Add the camera permission to your AndroidManifest.xml
