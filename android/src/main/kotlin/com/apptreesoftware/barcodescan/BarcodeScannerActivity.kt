@@ -26,7 +26,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.Menu
@@ -38,32 +37,29 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
-    //lateinit var pressLightSnackBar: Snackbar
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         val TOGGLE_FLASH = 200
 
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = ""
         scannerView = ZXingScannerView(this)
         scannerView.setAutoFocus(true)
         setContentView(scannerView)
-//        pressLightSnackBar = Snackbar.make(scannerView, "Press Screen To Turn Light On",
-//                                           Int.MAX_VALUE)
-//        pressLightSnackBar.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (scannerView.flash) {
             val item = menu.add(0,
-                                TOGGLE_FLASH, 0, "Flash Off")
+                    TOGGLE_FLASH, 0, "Flash Off")
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         } else {
             val item = menu.add(0,
-                                TOGGLE_FLASH, 0, "Flash On")
+                    TOGGLE_FLASH, 0, "Flash On")
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         }
         return super.onCreateOptionsMenu(menu)
@@ -81,6 +77,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     override fun onResume() {
         super.onResume()
         scannerView.setResultHandler(this)
+        // start camera immediately if permission is already given
         if (!requestCameraAccessIfNecessary()) {
             scannerView.startCamera()
         }
@@ -98,38 +95,38 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         finish()
     }
 
+    fun finishWithError(errorCode: String) {
+        val intent = Intent()
+        intent.putExtra("ERROR_CODE", errorCode)
+        setResult(Activity.RESULT_CANCELED, intent)
+        finish()
+    }
+
     private fun requestCameraAccessIfNecessary(): Boolean {
         val array = arrayOf(Manifest.permission.CAMERA)
         if (ContextCompat
-            .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-                val snackbar = Snackbar.make(scannerView, "Grant access to the camera to enable barcode scanning.", Snackbar.LENGTH_INDEFINITE)
-                snackbar.setAction("OK") {
-                    ActivityCompat.requestPermissions(this,
-                                            array,
-                                                      REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
-                }
-                snackbar.show()
-            } else {
-                ActivityCompat.requestPermissions(this,
-                                                  array,
-                                                  REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
-            }
+                .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, array,
+                    REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
             return true
         }
         return false
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
-                                            grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
         when (requestCode) {
             REQUEST_TAKE_PHOTO_CAMERA_PERMISSION -> {
                 if (PermissionUtil.verifyPermissions(grantResults)) {
                     scannerView.startCamera()
+                } else {
+                    finishWithError("PERMISSION_NOT_GRANTED")
                 }
             }
+            else -> {
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+            }
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
 
