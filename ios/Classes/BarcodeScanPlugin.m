@@ -27,7 +27,11 @@
 }
 
 - (void)barcodeScannerViewController:(BarcodeScannerViewController *)controller didScanBarcodeWithResult:(NSString *)result {
-    if (self.result) {
+    if (self.result && [result isEqualToString: @"PERMISSION_NOT_GRANTED"]){
+        self.result([FlutterError errorWithCode:@"PERMISSION_NOT_GRANTED"
+                                   message:nil
+                                   details:nil]);
+    } else if (self.result) {
         self.result(result);
     }
 }
