@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
       String barcode = await BarcodeScanner.scan();
       setState(() => this.barcode = barcode);
     } on PlatformException catch (e) {
-      if (e.code == 'PERMISSION_NOT_GRANTED') {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
           this.barcode = 'The user did not grant the camera permission!';
         });
