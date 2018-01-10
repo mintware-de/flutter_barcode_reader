@@ -38,7 +38,7 @@
         if (success) {
             [self startScan];
         } else {
-          [self.delegate barcodeScannerViewController:self didScanBarcodeWithErrorCode:@"PERMISSION_NOT_GRANTED"];
+          [self.delegate barcodeScannerViewController:self didFailWithErrorCode:@"PERMISSION_NOT_GRANTED"];
           [self dismissViewControllerAnimated:NO completion:nil];
         }
     }];

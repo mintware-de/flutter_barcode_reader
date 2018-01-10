@@ -32,7 +32,7 @@
     }
 }
 
-- (void)barcodeScannerViewController:(BarcodeScannerViewController *)controller didScanBarcodeWithErrorCode:(NSString *)errorCode {
+- (void)barcodeScannerViewController:(BarcodeScannerViewController *)controller didFailWithErrorCode:(NSString *)errorCode {
     if (self.result){
         self.result([FlutterError errorWithCode:errorCode
                                         message:nil
