@@ -38,7 +38,8 @@
         if (success) {
             [self startScan];
         } else {
-            [self showNoCameraAccessAlert];
+          [self.delegate barcodeScannerViewController:self didFailWithErrorCode:@"PERMISSION_NOT_GRANTED"];
+          [self dismissViewControllerAnimated:NO completion:nil];
         }
     }];
 }
@@ -79,16 +80,6 @@
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self action:@selector(toggle)];
     }
-}
-
-- (void)showNoCameraAccessAlert {
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Camera access denied"
-                                                                             message:@"Camera access has been disabled for this application. To turn camera access back on, please go to the iOS settings application."
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
-    [alertController addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }]];
-    [self presentViewController:alertController animated:YES completion:nil];
 }
 
 - (void)toggle {
