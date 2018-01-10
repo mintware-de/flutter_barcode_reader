@@ -9,5 +9,6 @@
 @protocol BarcodeScannerViewControllerDelegate <NSObject>
 
 - (void)barcodeScannerViewController:(BarcodeScannerViewController *)controller didScanBarcodeWithResult:(NSString *)result;
+- (void)barcodeScannerViewController:(BarcodeScannerViewController *)controller didScanBarcodeWithErrorCode:(NSString *)errorCode;
 
 @end
