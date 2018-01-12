@@ -12,7 +12,7 @@ Android: https://github.com/dm77/barcodescanner
 - [x] Scan 2D barcodes
 - [x] Scan QR codes
 - [x] Control the flash while scanning
-- [ ] Customize the permission request text
+- [x] Permission handling
 - [ ] Support multiple barcode libraries
 
 ## Getting Started
