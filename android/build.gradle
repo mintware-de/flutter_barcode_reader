@@ -1,4 +1,4 @@
-egroup 'com.apptreesoftware.barcodescan'
+group 'com.apptreesoftware.barcodescan'
 version '1.0-SNAPSHOT'
 
 buildscript {
