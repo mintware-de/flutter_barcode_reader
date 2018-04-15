@@ -1,4 +1,4 @@
-group 'com.apptreesoftware.barcodescan'
+egroup 'com.apptreesoftware.barcodescan'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -11,6 +11,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.2-4'
     }
 }
 
