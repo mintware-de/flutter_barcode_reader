@@ -47,7 +47,7 @@ android {
 }
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-4'
-    compile 'me.dm7.barcodescanner:zxing:1.9.8'
-    compile 'com.android.support:design:27.1.1'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.2-4'
+    implementation 'me.dm7.barcodescanner:zxing:1.9.8'
+    implementation 'com.android.support:design:27.1.1'
 }
