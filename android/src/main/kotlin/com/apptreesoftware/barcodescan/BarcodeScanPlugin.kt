@@ -9,14 +9,14 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-class BarcodeScanPlugin(val activity: Activity): MethodCallHandler,
+class BarcodeScanPlugin(val registrar: Registrar): MethodCallHandler,
     PluginRegistry.ActivityResultListener {
   var result : Result? = null
   companion object {
     @JvmStatic
     fun registerWith(registrar: Registrar): Unit {
       val channel = MethodChannel(registrar.messenger(), "com.apptreesoftware.barcode_scan")
-      val plugin = BarcodeScanPlugin(registrar.activity())
+      val plugin = BarcodeScanPlugin(registrar)
       channel.setMethodCallHandler(plugin)
       registrar.addActivityResultListener(plugin)
     }
@@ -32,8 +32,8 @@ class BarcodeScanPlugin(val activity: Activity): MethodCallHandler,
   }
 
   private fun showBarcodeView() {
-    val intent = Intent(activity, BarcodeScannerActivity::class.java)
-    activity.startActivityForResult(intent, 100)
+    val intent = Intent(registrar.activity(), BarcodeScannerActivity::class.java)
+    registrar.activity().startActivityForResult(intent, 100)
   }
 
   override fun onActivityResult(code: Int, resultCode: Int, data: Intent?): Boolean {
