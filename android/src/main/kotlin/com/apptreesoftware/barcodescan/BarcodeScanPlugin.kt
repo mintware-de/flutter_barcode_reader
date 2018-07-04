@@ -23,16 +23,18 @@ class BarcodeScanPlugin(val registrar: Registrar): MethodCallHandler,
   }
 
   override fun onMethodCall(call: MethodCall, result: Result): Unit {
-    if (call.method.equals("scan")) {
+    if (call.method == "scan") {
       this.result = result
-      showBarcodeView()
+      val formats = call.argument<String>("formats")
+      showBarcodeView(formats)
     } else {
       result.notImplemented()
     }
   }
 
-  private fun showBarcodeView() {
+  private fun showBarcodeView(formats: String) {
     val intent = Intent(registrar.activity(), BarcodeScannerActivity::class.java)
+    intent.putExtra("formats", formats)
     registrar.activity().startActivityForResult(intent, 100)
   }
 

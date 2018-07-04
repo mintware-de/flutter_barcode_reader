@@ -45,6 +45,7 @@ class _MyAppState extends State<MyApp> {
 
   Future scan() async {
     try {
+      //String barcode = await BarcodeScanner.scan(types: [BarcodeType.PDF_417, BarcodeType.DATA_MATRIX]);
       String barcode = await BarcodeScanner.scan();
       setState(() => this.barcode = barcode);
     } on PlatformException catch (e) {

@@ -9,8 +9,10 @@ import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
+import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
+import java.util.stream.Collectors.toList
 
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
@@ -26,7 +28,14 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = ""
+
+        val formats = intent.getStringExtra("formats")
+        val types = this._barcodeStringToEnums(formats)
         scannerView = ZXingScannerView(this)
+
+        scannerView.formats.removeAll(ZXingScannerView.ALL_FORMATS)
+        scannerView.setFormats(types)
+
         scannerView.setAutoFocus(true)
         setContentView(scannerView)
     }
@@ -74,7 +83,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         finish()
     }
 
-    fun finishWithError(errorCode: String) {
+    private fun finishWithError(errorCode: String) {
         val intent = Intent()
         intent.putExtra("ERROR_CODE", errorCode)
         setResult(Activity.RESULT_CANCELED, intent)
@@ -106,6 +115,30 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             }
         }
+    }
+
+    fun _barcodeStringToEnums(formats : String) : MutableList<BarcodeFormat> {
+        if (formats == "") {
+            return ZXingScannerView.ALL_FORMATS
+        }
+        return formats.split(' ').map {
+            when (it) {
+                "UPC_A" -> BarcodeFormat.UPC_A
+                "UPC_E" -> BarcodeFormat.UPC_E
+                "EAN_13" -> BarcodeFormat.EAN_13
+                "EAN_8" -> BarcodeFormat.EAN_8
+                "RSS_14" -> BarcodeFormat.RSS_14
+                "CODE_39" -> BarcodeFormat.CODE_39
+                "CODE_93" -> BarcodeFormat.CODE_93
+                "CODE_128" -> BarcodeFormat.CODE_128
+                "ITF" -> BarcodeFormat.ITF
+                "CODABAR" -> BarcodeFormat.CODABAR
+                "QR_CODE" -> BarcodeFormat.QR_CODE
+                "DATA_MATRIX" -> BarcodeFormat.DATA_MATRIX
+                "PDF_417" -> BarcodeFormat.PDF_417
+                else -> {}
+            }
+        }.filterIsInstance<BarcodeFormat>().toList().toMutableList()
     }
 }
 
