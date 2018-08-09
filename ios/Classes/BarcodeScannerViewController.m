@@ -27,6 +27,7 @@
                                   views:@{@"previewView": _previewView}]];
     self.scanner = [[MTBBarcodeScanner alloc] initWithPreviewView:_previewView];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+  [self updateFlashButton];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -90,7 +91,7 @@
 - (BOOL)isFlashOn {
     AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     if (device) {
-        return device.torchMode == AVCaptureFlashModeOn || AVCaptureTorchModeOn;
+        return device.torchMode == AVCaptureFlashModeOn || device.torchMode == AVCaptureTorchModeOn;
     }
     return NO;
 }
