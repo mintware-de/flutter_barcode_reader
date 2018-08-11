@@ -4,6 +4,7 @@
 
 #import "BarcodeScannerViewController.h"
 #import <MTBBarcodeScanner/MTBBarcodeScanner.h>
+#import "ScannerOverlay.h"
 
 
 @implementation BarcodeScannerViewController {
@@ -25,7 +26,26 @@
                                 options:NSLayoutFormatAlignAllBottom
                                 metrics:nil
                                   views:@{@"previewView": _previewView}]];
+  self.scanRect = [[ScannerOverlay alloc] initWithFrame:self.view.bounds];
+  self.scanRect.translatesAutoresizingMaskIntoConstraints = NO;
+  self.scanRect.backgroundColor = UIColor.clearColor;
+  [self.view addSubview:_scanRect];
+  [self.view addConstraints:[NSLayoutConstraint
+                             constraintsWithVisualFormat:@"V:[scanRect]"
+                             options:NSLayoutFormatAlignAllBottom
+                             metrics:nil
+                             views:@{@"scanRect": _scanRect}]];
+  [self.view addConstraints:[NSLayoutConstraint
+                             constraintsWithVisualFormat:@"H:[scanRect]"
+                             options:NSLayoutFormatAlignAllBottom
+                             metrics:nil
+                             views:@{@"scanRect": _scanRect}]];
+  [_scanRect startAnimating];
     self.scanner = [[MTBBarcodeScanner alloc] initWithPreviewView:_previewView];
+  __weak BarcodeScannerViewController *weakSelf = self;
+  self.scanner.didStartScanningBlock = ^{
+    weakSelf.scanner.scanRect = weakSelf.scanRect.scanLineRect;
+  };
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
   [self updateFlashButton];
 }

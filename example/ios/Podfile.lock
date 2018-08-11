@@ -7,7 +7,7 @@ PODS:
 
 DEPENDENCIES:
   - barcode_scan (from `/Users/dustin/Documents/workspace_flutter/flutter_barcode_reader/ios`)
-  - Flutter (from `/Users/dustin/flutter/bin/cache/artifacts/engine/ios-release`)
+  - Flutter (from `/Users/dustin/flutter/bin/cache/artifacts/engine/ios`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -17,7 +17,7 @@ EXTERNAL SOURCES:
   barcode_scan:
     :path: "/Users/dustin/Documents/workspace_flutter/flutter_barcode_reader/ios"
   Flutter:
-    :path: "/Users/dustin/flutter/bin/cache/artifacts/engine/ios-release"
+    :path: "/Users/dustin/flutter/bin/cache/artifacts/engine/ios"
 
 SPEC CHECKSUMS:
   barcode_scan: 8288e70cb430072003bce2c794a1431e7adbcb4d
