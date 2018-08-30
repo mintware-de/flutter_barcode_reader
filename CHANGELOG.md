@@ -1,3 +1,7 @@
+## [0.0.7] - 8/30/18
+
+* Fix iOS barcodes not scanning
+
 ## [0.0.6] - 8/29/18
 
 * Fix android dependencies
