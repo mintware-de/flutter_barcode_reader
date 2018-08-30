@@ -42,10 +42,6 @@
                              views:@{@"scanRect": _scanRect}]];
   [_scanRect startAnimating];
     self.scanner = [[MTBBarcodeScanner alloc] initWithPreviewView:_previewView];
-  __weak BarcodeScannerViewController *weakSelf = self;
-  self.scanner.didStartScanningBlock = ^{
-    weakSelf.scanner.scanRect = weakSelf.scanRect.scanLineRect;
-  };
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
   [self updateFlashButton];
 }
