@@ -49,5 +49,5 @@ android {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.51'
     implementation 'me.dm7.barcodescanner:zxing:1.9.8'
-    implementation 'com.android.support:design:27.1.1'
+    api 'com.android.support:design:27.1.1'
 }
