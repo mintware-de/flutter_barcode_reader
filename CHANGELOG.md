@@ -1,4 +1,9 @@
-## [0.0.4] - 2/8/17
+## [0.0.6] - 8/29/18
+
+* Fix android dependencies
+* iOS scanner now looks like Android thanks to @dustin-graham 
+
+## [0.0.4] - 2/8/18
 
 * Fix missing gradle dependency (thanks to [toteto](https://github.com/apptreesoftware/flutter_barcode_reader/pull/15))
 * Update gradle dependencies
