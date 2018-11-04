@@ -25,13 +25,15 @@ class BarcodeScanPlugin(val activity: Activity): MethodCallHandler,
   override fun onMethodCall(call: MethodCall, result: Result): Unit {
     if (call.method.equals("scan")) {
       this.result = result
-      showBarcodeView()
+      showBarcodeView(call.argument<String>("flashOnText"), call.argument<String>("flashOffText"))
     } else {
       result.notImplemented()
     }
   }
 
-  private fun showBarcodeView() {
+  private fun showBarcodeView(flashOnText: String, flashOffText: String) {
+    BarcodeScannerActivity.FLASH_ON_TEXT = flashOnText;
+    BarcodeScannerActivity.FLASH_OFF_TEXT = flashOffText;
     val intent = Intent(activity, BarcodeScannerActivity::class.java)
     activity.startActivityForResult(intent, 100)
   }
