@@ -62,6 +62,7 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [self.scanner stopScanning];
     [super viewWillDisappear:animated];
     if ([self isFlashOn]) {
         [self toggleFlash:NO];
