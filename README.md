@@ -26,7 +26,7 @@ For Android, you must do the following before you can use the plugin:
 
 * Add the BarcodeScanner activity to your AndroidManifest.xml. Do NOT modify the name.
     
-     `<activity android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity"/>`
+     `<activity android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity" exported="true"/>`
      
 
 * This plugin is written in Kotlin. Therefore, you need to add Kotlin support to your project. See [installing the Kotlin plugin](https://kotlinlang.org/docs/tutorials/kotlin-android.html#installing-the-kotlin-plugin).
