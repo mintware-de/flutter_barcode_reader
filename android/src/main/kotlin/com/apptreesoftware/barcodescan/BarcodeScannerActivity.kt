@@ -32,13 +32,16 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val titleOff = intent.getStringExtra("BarcodeTranslationKey.flashOff")
+        val titleOn = intent.getStringExtra("BarcodeTranslationKey.flashOn")
+
         if (scannerView.flash) {
             val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "Flash Off")
+                    TOGGLE_FLASH, 0, titleOff)
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         } else {
             val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "Flash On")
+                    TOGGLE_FLASH, 0, titleOn)
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         }
         return super.onCreateOptionsMenu(menu)

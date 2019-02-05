@@ -41,8 +41,15 @@
                              metrics:nil
                              views:@{@"scanRect": _scanRect}]];
   [_scanRect startAnimating];
-    self.scanner = [[MTBBarcodeScanner alloc] initWithPreviewView:_previewView];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+  self.scanner = [[MTBBarcodeScanner alloc] initWithPreviewView:_previewView];
+  NSString *title = _translations[@"BarcodeTranslationKey.cancel"];
+  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithTitle:title
+                                           style: UIBarButtonItemStylePlain
+                                           target:self
+                                           action:@selector(cancel)];
+
+    
   [self updateFlashButton];
 }
 
@@ -90,11 +97,13 @@
         return;
     }
     if (self.isFlashOn) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Flash Off"
+        NSString *title = _translations[@"BarcodeTranslationKey.flashOff"];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:title
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self action:@selector(toggle)];
     } else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Flash On"
+        NSString *title = _translations[@"BarcodeTranslationKey.flashOn"];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:title
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self action:@selector(toggle)];
     }

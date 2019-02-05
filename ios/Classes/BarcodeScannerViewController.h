@@ -14,6 +14,7 @@
   @property(nonatomic, retain) ScannerOverlay *scanRect;
 @property(nonatomic, retain) MTBBarcodeScanner *scanner;
 @property(nonatomic, weak) id<BarcodeScannerViewControllerDelegate> delegate;
+@property(nonatomic, retain) NSDictionary<NSString *, NSString*> *translations;
 
   
   -(id) initWithOptions:(NSDictionary *) options;

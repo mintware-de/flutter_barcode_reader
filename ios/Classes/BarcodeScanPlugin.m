@@ -13,15 +13,16 @@
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     if ([@"scan" isEqualToString:call.method]) {
         self.result = result;
-        [self showBarcodeView];
+        [self showBarcodeViewWithTranslations: call.arguments[@"translations"]];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
-- (void)showBarcodeView {
+- (void)showBarcodeViewWithTranslations:(NSDictionary *)translations {
     BarcodeScannerViewController *scannerViewController = [[BarcodeScannerViewController alloc] init];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:scannerViewController];
+    scannerViewController.translations = translations;
     scannerViewController.delegate = self;
     [self.hostViewController presentViewController:navigationController animated:NO completion:nil];
 }
