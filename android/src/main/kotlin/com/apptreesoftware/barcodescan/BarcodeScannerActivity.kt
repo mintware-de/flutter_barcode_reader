@@ -28,6 +28,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         title = ""
         scannerView = ZXingScannerView(this)
         scannerView.setAutoFocus(true)
+        // this paramter will make your HUAWEI phone works great!
+        scannerView.setAspectTolerance(0.5f)
         setContentView(scannerView)
     }
 
