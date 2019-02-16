@@ -12,6 +12,7 @@ import android.view.MenuItem
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.content.ClipboardManager
+import com.yourcompany.barcodescan.R
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
@@ -25,6 +26,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.BarcodeScannerTheme)
         super.onCreate(savedInstanceState)
         title = ""
         scannerView = ZXingScannerView(this)

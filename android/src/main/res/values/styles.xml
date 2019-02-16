@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="BarcodeScannerTheme">
+        <item name="android:colorPrimary">#055DEB</item>
+    </style>
+</resources>
