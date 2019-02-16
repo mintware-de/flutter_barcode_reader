@@ -36,7 +36,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val item = menu.add(0,
-                PASTE, 0, "Paste Invoice")
+                PASTE, 0, "PASTE INVOICE")
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         if (scannerView.flash) {
             val item = menu.add(0,
