@@ -11,16 +11,17 @@ import android.view.Menu
 import android.view.MenuItem
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
-
+import android.content.ClipboardManager
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
+    private var clipboard: ClipboardManager? = null
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         val TOGGLE_FLASH = 200
-
+        val PASTE = 300
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,12 +29,15 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         title = ""
         scannerView = ZXingScannerView(this)
         scannerView.setAutoFocus(true)
-        // this paramter will make your HUAWEI phone works great!
         scannerView.setAspectTolerance(0.5f)
         setContentView(scannerView)
+        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val item = menu.add(0,
+                PASTE, 0, "Paste Invoice")
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         if (scannerView.flash) {
             val item = menu.add(0,
                     TOGGLE_FLASH, 0, "Flash Off")
@@ -51,6 +55,14 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             scannerView.flash = !scannerView.flash
             this.invalidateOptionsMenu()
             return true
+        }
+        if (item.itemId == PASTE) {
+            val intent = Intent()
+            val clip = clipboard?.primaryClip
+            val pasteText = clip?.getItemAt(0)
+            intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
         return super.onOptionsItemSelected(item)
     }
