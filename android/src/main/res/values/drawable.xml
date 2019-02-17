@@ -1,0 +1,3 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <item name="ic_paste" type="drawable">@drawable/ic_paste</item>
+</resources>

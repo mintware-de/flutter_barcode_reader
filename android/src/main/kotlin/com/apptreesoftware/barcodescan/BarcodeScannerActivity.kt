@@ -7,12 +7,15 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
-import android.view.Menu
-import android.view.MenuItem
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.content.ClipboardManager
 import com.yourcompany.barcodescan.R
+import android.view.LayoutInflater
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.widget.Button
+
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
@@ -21,8 +24,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
-        val TOGGLE_FLASH = 200
-        val PASTE = 300
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,32 +35,27 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         scannerView.setAutoFocus(true)
         scannerView.setAspectTolerance(0.5f)
         setContentView(scannerView)
+        val inflator = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val v = inflator.inflate(com.yourcompany.barcodescan.R.layout.layout, null)
+        actionBar.customView = v
+        actionBar.setDisplayShowCustomEnabled(true)
         clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val item = menu.add(0,
-                PASTE, 0, "PASTE INVOICE")
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        if (scannerView.flash) {
-            val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "Flash Off")
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        } else {
-            val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "Flash On")
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == TOGGLE_FLASH) {
+        var flashBtn = findViewById<Button>(R.id.TOGGLE_FLASH)
+        flashBtn.setOnClickListener {
             scannerView.flash = !scannerView.flash
+            if (!scannerView.flash) {
+                flashBtn.text = "FLASH ON"
+                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_on)
+                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null)
+            } else {
+                flashBtn.text = "FLASH OFF"
+                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_off)
+                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null)
+            }
             this.invalidateOptionsMenu()
-            return true
         }
-        if (item.itemId == PASTE) {
+        var pasteBtn = findViewById<Button>(R.id.PASTE)
+        pasteBtn.setOnClickListener {
             val intent = Intent()
             val clip = clipboard?.primaryClip
             val pasteText = clip?.getItemAt(0)
@@ -66,7 +63,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
-        return super.onOptionsItemSelected(item)
+
     }
 
     override fun onResume() {

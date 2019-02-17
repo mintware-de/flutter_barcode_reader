@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <Button
+        android:id="@+id/PASTE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:background="@android:color/transparent"
+        android:drawableLeft="@drawable/ic_paste"
+        android:drawableStart="@drawable/ic_paste"
+        android:drawablePadding="8dp"
+        android:text="PASTE INVOICE"
+        android:textColor="@android:color/white"
+        android:scaleType="centerInside" />
+
+    <Button
+        android:id="@+id/TOGGLE_FLASH"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@android:color/transparent"
+        android:drawableRight="@drawable/ic_flash_on"
+        android:drawableEnd="@drawable/ic_flash_on"
+        android:drawablePadding="8dp"
+        android:text="Flash On"
+        android:textColor="@android:color/white"
+        android:scaleType="centerInside" />
+
+</RelativeLayout>
