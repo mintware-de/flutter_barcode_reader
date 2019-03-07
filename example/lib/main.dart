@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String barcode = "";
+  var barcode;
 
   @override
   initState() {
@@ -33,20 +33,40 @@ class _MyAppState extends State<MyApp> {
               children: <Widget>[
                 new Container(
                   child: new MaterialButton(
-                      onPressed: scan, child: new Text("Scan")),
+                      onPressed: ()async{
+                       await scan(1);
+          }, child: new Text("Scan")),
                   padding: const EdgeInsets.all(8.0),
                 ),
-                new Text(barcode),
+
+                new Container(
+                  child: new MaterialButton(
+                      onPressed: ()async{
+                       await scan(2);
+                      }, child: new Text("Multi Scan")),
+                  padding: const EdgeInsets.all(8.0),
+                ),
+                new Text(barcode.toString()??""),
               ],
             ),
           )),
     );
   }
 
-  Future scan() async {
+  Future scan(int type) async {
     try {
-      String barcode = await BarcodeScanner.scan();
-      setState(() => this.barcode = barcode);
+      if(type==1){
+        String barcode = await BarcodeScanner.scan();
+        print("**$barcode");
+        setState(() => this.barcode = barcode);
+
+      }else{
+        var barcode = await BarcodeScanner.multiScan();
+        print("*L*$barcode");
+        setState(() => this.barcode = barcode);
+
+      }
+
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {

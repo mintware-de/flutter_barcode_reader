@@ -14,7 +14,10 @@
     if ([@"scan" isEqualToString:call.method]) {
         self.result = result;
         [self showBarcodeView];
-    } else {
+    } else if ([@"multiscan" isEqualToString:call.method]) {
+        self.result = result;
+        [self showBarcodeView];
+    } else{
         result(FlutterMethodNotImplemented);
     }
 }
