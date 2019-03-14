@@ -1,3 +1,11 @@
+## [1.0.0] - 8/30/18
+
+Breaking Change: Adds support for AndroidX
+
+## [0.0.8] - 8/30/18
+
+* Fixes [iOS: pressing cancel doesn't stop scanning](https://github.com/apptreesoftware/flutter_barcode_reader/issues/60) thanks to @tgezginis.
+
 ## [0.0.7] - 8/30/18
 
 * Fix iOS barcodes not scanning
