@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:barcode_scan/barcode_scan.dart';
+import 'package:barcode_scan/scanner_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -45,7 +46,10 @@ class _MyAppState extends State<MyApp> {
 
   Future scan() async {
     try {
-      String barcode = await BarcodeScanner.scan();
+      String barcode = await BarcodeScanner.scan(options: ScannerOptions(
+        flashOnText: "Custom Flash On",
+        flashOffText: "Custom Flash Off",
+      ));
       setState(() => this.barcode = barcode);
     } on PlatformException catch (e) {
       if (e.code == BarcodeScanner.CameraAccessDenied) {

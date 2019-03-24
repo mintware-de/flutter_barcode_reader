@@ -1,5 +1,6 @@
 #import "BarcodeScanPlugin.h"
 #import "BarcodeScannerViewController.h"
+#import "ScannerOptions.m"
 
 @implementation BarcodeScanPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
@@ -13,14 +14,17 @@
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     if ([@"scan" isEqualToString:call.method]) {
         self.result = result;
-        [self showBarcodeView];
+        ScannerOptions opts;
+        opts.flashOffText = call.arguments[@"flashOffText"];
+        opts.flashOnText = call.arguments[@"flashOnText"];
+        [self showBarcodeView:opts];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
-- (void)showBarcodeView {
-    BarcodeScannerViewController *scannerViewController = [[BarcodeScannerViewController alloc] init];
+- (void)showBarcodeView:(ScannerOptions) options {
+    BarcodeScannerViewController *scannerViewController = [[BarcodeScannerViewController alloc] initWithScannerOptions:options];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:scannerViewController];
     scannerViewController.delegate = self;
     [self.hostViewController presentViewController:navigationController animated:NO completion:nil];

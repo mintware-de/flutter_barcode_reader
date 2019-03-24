@@ -5,11 +5,19 @@
 #import "BarcodeScannerViewController.h"
 #import <MTBBarcodeScanner/MTBBarcodeScanner.h>
 #import "ScannerOverlay.h"
+#import "ScannerOptions.m"
 
 
 @implementation BarcodeScannerViewController {
 }
 
+- (id) initWithScannerOptions:(ScannerOptions)scannerOptions{
+    self = [super init];
+    if (self) {
+        self.scannerOptions = scannerOptions;
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -90,11 +98,11 @@
         return;
     }
     if (self.isFlashOn) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Flash Off"
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.scannerOptions.flashOffText
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self action:@selector(toggle)];
     } else {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Flash On"
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:self.scannerOptions.flashOnText
                                                                                   style:UIBarButtonItemStylePlain
                                                                                  target:self action:@selector(toggle)];
     }
