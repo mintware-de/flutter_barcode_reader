@@ -26,8 +26,8 @@ class BarcodeScanPlugin(val activity: Activity): MethodCallHandler,
     if (call.method.equals("scan")) {
       this.result = result
       val opts = ScannerOptions(
-              flashOffText = call.argument<String>("flashOffText").toString(),
-              flashOnText = call.argument<String>("flashOnText").toString()
+              flashOffText = call.argument("flashOffText").toString(),
+              flashOnText = call.argument("flashOnText").toString()
       )
       showBarcodeView(opts)
     } else {
