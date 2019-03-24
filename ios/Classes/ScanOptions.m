@@ -7,4 +7,4 @@
 typedef struct{
     NSString* flashOnText;
     NSString* flashOffText;
-} ScannerOptions;
+} ScanOptions;

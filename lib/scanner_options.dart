@@ -1,8 +1,8 @@
-class ScannerOptions {
+class ScanOptions {
   final String flashOnText;
   final String flashOffText;
 
-  ScannerOptions({
+  ScanOptions({
     this.flashOnText = "Flash On",
     this.flashOffText = "Flash Off",
   });

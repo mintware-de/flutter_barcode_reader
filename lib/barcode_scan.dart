@@ -8,8 +8,8 @@ class BarcodeScanner {
   static const MethodChannel _channel =
       const MethodChannel('com.apptreesoftware.barcode_scan');
 
-  static Future<String> scan({ScannerOptions options}) async {
-    options = options ?? ScannerOptions();
+  static Future<String> scan({ScanOptions options}) async {
+    options = options ?? ScanOptions();
     await _channel.invokeMethod('scan', options.toDynamic());
   }
 }

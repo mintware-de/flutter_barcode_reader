@@ -20,7 +20,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         val TOGGLE_FLASH = 200
-        var options = ScannerOptions("Flash Off", "Flash On");
+        var options = ScanOptions("Flash Off", "Flash On");
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

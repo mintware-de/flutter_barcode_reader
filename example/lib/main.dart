@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
 
   Future scan() async {
     try {
-      String barcode = await BarcodeScanner.scan(options: ScannerOptions(
+      String barcode = await BarcodeScanner.scan(options: ScanOptions(
         flashOnText: "Custom Flash On",
         flashOffText: "Custom Flash Off",
       ));
