@@ -56,7 +56,7 @@ Now you can depend on the barcode_scan plugin in your pubspec.yaml file:
 
 	dependencies:
 	  ...
-	  barcode_scan: ^0.0.3
+	  barcode_scan: ^1.0.0
 
 Click "Packages get" in Android Studio or run `flutter packages get` in your project folder.
 
