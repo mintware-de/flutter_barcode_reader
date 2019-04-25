@@ -13,9 +13,9 @@ A new flutter plugin project.
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.dependency 'MTBBarcodeScanner'
   s.ios.deployment_target = '8.0'
+  s.pod_target_xcconfig = { "DEFINES_MODULE" => "YES" }
 end
 

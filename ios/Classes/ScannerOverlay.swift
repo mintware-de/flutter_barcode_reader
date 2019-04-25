@@ -1,3 +1,5 @@
+import UIKit
+
 class ScannerOverlay: UIView
 {
     var line = UIView()

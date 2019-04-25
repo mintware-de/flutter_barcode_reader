@@ -1,3 +1,4 @@
+import UIKit
 
 class BarcodeScannerPlugin : NSObject,FlutterPlugin,BarcodeScannerViewControllerDelegate
 {
@@ -19,7 +20,7 @@ class BarcodeScannerPlugin : NSObject,FlutterPlugin,BarcodeScannerViewController
     }
     
     var hostViewController : UIViewController?
-    var callback : (Any->())?
+    var callback : ((Any)->())?
 
     func showBarcodeView(_ result:@escaping FlutterResult)
     {

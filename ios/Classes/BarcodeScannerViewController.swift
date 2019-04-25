@@ -13,8 +13,9 @@ class BarcodeScannerNavigationController : UINavigationController
         return true
     }
     
-    func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return UIStatusBarStyleLightContent
+    func preferredStatusBarStyle() -> UIStatusBarStyle
+    {
+        return .lightContent
     }
 }
 
@@ -30,114 +31,142 @@ class BarcodeScannerViewController: UIViewController
     
     private var wasScanning : Bool = false
     
-    func prefersStatusBarHidden() -> Bool {
+    func prefersStatusBarHidden() -> Bool
+    {
         return true
     }
     
-    func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return UIStatusBarStyleLightContent
+    func preferredStatusBarStyle() -> UIStatusBarStyle
+    {
+        return .lightContent
     }
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        self.previewView = UIView(frame:self.view.bounds)
-        self.previewView.autoresizingMask = [.flexibleWidth,.flexibleHeight]
-        self.view.addSubview(_previewView)
+        let pv = UIView(frame:self.view.bounds)
+        pv.autoresizingMask = [.flexibleWidth,.flexibleHeight]
+        view.addSubview(pv)
+        previewView = pv
         
-        self.scanRect = ScannerOverlay(frame:self.view.bounds)
-        self.scanRect.autoresizingMask = [.flexibleWidth,.flexibleHeight]
-        self.scanRect.backgroundColor = .clearColor
-        self.view.addSubview(_scanRect)
-        _scanRect.startAnimating()
-        self.scanner = MTBBarcodeScanner(previewView:_previewView)
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem:UIBarButtonSystemItemCancel, target:self, action:Selector("cancel"))
-        self.updateFlashButton()
+        let sr = ScannerOverlay(frame:self.view.bounds)
+        sr.autoresizingMask = [.flexibleWidth,.flexibleHeight]
+        sr.backgroundColor = .clear
+        view.addSubview(sr)
+        sr.startAnimating()
+        scanRect = sr
         
-        self.closeButton = UIBarButtonItem(barButtonSystemItem:UIBarButtonSystemItemCancel, target:self, action:Selector("cancel"))
-        self.flashButton = UIBarButtonItem(title:"FLASH ON", style:UIBarButtonItemStylePlain, target:self, action:Selector("toggle"))
-        self.toolbarItems = [self.closeButton,UIBarButtonItem(barButtonSystemItem:UIBarButtonSystemItemFlexibleSpace, target:nil, action:nil),self.flashButton]
+        scanner = MTBBarcodeScanner(previewView:pv)
+        updateFlashButton()
+        
+        let close = UIBarButtonItem(barButtonSystemItem:.cancel, target:self, action:#selector(cancel))
+        let flash = UIBarButtonItem(title:"FLASH ON", style:.plain, target:self, action:#selector(toggle))
+        let flex = UIBarButtonItem(barButtonSystemItem:.flexibleSpace, target:nil, action:nil)
+        toolbarItems = [close,flex,flash]
+        closeButton = close
+        flashButton = flash
     }
     
     override func viewWillAppear(_ animated:Bool)
     {
         super.viewWillAppear(animated)
         
-        self.navigationController.toolbarHidden = false
-        self.navigationController.setNavigationBarHidden(true, animated:false)
+        navigationController?.isToolbarHidden = false
+        navigationController?.setNavigationBarHidden(true, animated:false)
         
-        self.navigationController.toolbar.tintColor = UIColor.whiteColor()
-        self.navigationController.toolbar.translucent = true
-        self.navigationController.toolbar.setBackgroundImage(UIImage(),
-                                                             forToolbarPosition:UIToolbarPositionAny,
-                                                             barMetrics:UIBarMetricsDefault)
-        self.navigationController.toolbar.backgroundColor = UIColor.clearColor()
+        navigationController?.toolbar.tintColor = .white
+        navigationController?.toolbar.isTranslucent = true
+        navigationController?.toolbar.setBackgroundImage(UIImage(),forToolbarPosition:.any,barMetrics:.default)
+        navigationController?.toolbar.backgroundColor = .clear
     }
     
     override func viewDidAppear(_ animated:Bool)
     {
         super.viewDidAppear(animated)
-        if self.scanner.isScanning {
-            self.scanner.stopScanning()
+        
+        if let scanner = scanner
+        {
+            if scanner.isScanning()
+            {
+                scanner.stopScanning()
+            }
         }
-        MTBBarcodeScanner.requestCameraPermissionWithSuccess({ (success:Bool) in
+        
+        MTBBarcodeScanner.requestCameraPermission()
+        { success in
+            
             if success {
                 self.startScan()
             } else {
-                self.delegate.barcodeScannerViewController(self, didFailWithErrorCode:"PERMISSION_NOT_GRANTED")
-                self.dismissViewControllerAnimated(false, completion:nil)
+                self.delegate?.barcodeScannerViewController(self, didFailWithErrorCode:"PERMISSION_NOT_GRANTED")
+                self.dismiss(animated: false, completion:nil)
             }
-        })
+            
+        }
     }
     
     override func viewWillDisappear(_ animated:Bool)
     {
-        self.scanner.stopScanning()
+        self.scanner?.stopScanning()
         super.viewWillDisappear(animated)
-        if self.isFlashOn() {
+        if self.isFlashOn()
+        {
             self.toggleFlash(false)
         }
     }
     
-    override func viewWillTransitionToSize(size:CGSize, withTransitionCoordinator coordinator:UIViewControllerTransitionCoordinator)
+    override func viewWillTransition(to size:CGSize, with coordinator:UIViewControllerTransitionCoordinator)
     {
-        coordinator.animateAlongsideTransition({ (context:UIViewControllerTransitionCoordinatorContext)
-            in
+        coordinator.animate(alongsideTransition: { (context:UIViewControllerTransitionCoordinatorContext) in
             self.view.setNeedsLayout()
             self.view.layoutSubviews()
             let origin:CGPoint = self.view.frame.origin
-            self.scanner.previewLayer.frame = CGRectMake(origin.x, origin.y, size.width, size.height)
+            self.scanner?.previewLayer.frame = CGRect(x:origin.x,y:origin.y,width: size.width,height: size.height)
             
-            if self.scanner.isScanning
+            guard let scanner = self.scanner else { return }
+            if scanner.isScanning()
             {
-                wasScanning = true
-                self.scanner.stopScanning()
+                self.wasScanning = true
+                scanner.stopScanning()
             }
         }, completion:{ (context:UIViewControllerTransitionCoordinatorContext!)
             in
-            if wasScanning
-            {self.startScan()}
+            if self.wasScanning
+            {
+                self.startScan()
+            }
         })
         
-        super.viewWillTransitionToSize(size, withTransitionCoordinator:coordinator)
+        super.viewWillTransition(to:size, with:coordinator)
     }
     
     func startScan()
     {
-        var error:NSError!
-        self.scanner.startScanningWithResultBlock({ (codes:[AnyObject]!) in
-            self.scanner.stopScanning()
-            let code:AVMetadataMachineReadableCodeObject! = codes.firstObject
-            if (code != nil) {
-                self.delegate.barcodeScannerViewController(self, didScanBarcodeWithResult:code.stringValue)
-                self.dismissViewControllerAnimated(false, completion:nil)
+        guard let scanner = scanner else { return }
+        
+        do
+        {
+            try scanner.startScanning()
+            { codes in
+                
+                guard let code = codes?.first else { return }
+                
+                scanner.stopScanning()
+                
+                self.delegate?.barcodeScannerViewController(self,didScanBarcodeWithResult:code.stringValue)
+                self.dismiss(animated:false, completion:nil)
             }
-        }, error:&error)
+        }
+        catch
+        {
+            
+        }
     }
     
+    @objc
     func cancel()
     {
-        self.dismissViewControllerAnimated(true, completion:nil)
+        self.dismiss(animated: true, completion:nil)
     }
     
     func updateFlashButton()
@@ -147,12 +176,13 @@ class BarcodeScannerViewController: UIViewController
             return
         }
         if self.isFlashOn() {
-            self.flashButton.title = "FLASH OFF"
+            self.flashButton?.title = "FLASH OFF"
         } else {
-            self.flashButton.title = "FLASH ON"
+            self.flashButton?.title = "FLASH ON"
         }
     }
     
+    @objc
     func toggle()
     {
         self.toggleFlash(!self.isFlashOn())
@@ -161,39 +191,42 @@ class BarcodeScannerViewController: UIViewController
     
     func isFlashOn() -> Bool
     {
-        let device:AVCaptureDevice! = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
-        if (device != nil) {
-            return device.torchMode == AVCaptureFlashModeOn || device.torchMode == AVCaptureTorchModeOn
-        }
-        return false
+        guard let device : AVCaptureDevice = AVCaptureDevice.default(for: AVMediaType.video) else { return false }
+        return device.torchMode == .on
     }
     
     func hasTorch() -> Bool
     {
-        let device:AVCaptureDevice! = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
-        if (device != nil) {
-            return device.hasTorch
-        }
-        return false
+        guard let device : AVCaptureDevice = AVCaptureDevice.default(for: AVMediaType.video) else { return false }
+        return device.hasTorch
     }
     
-    func toggleFlash(on:Bool)
+    func toggleFlash(_ on:Bool)
     {
-        let device:AVCaptureDevice! = AVCaptureDevice.defaultDeviceWithMediaType(AVMediaTypeVideo)
-        if (device == nil) {return}
-        
-        var err:NSError!
-        if device.hasFlash && device.hasTorch {
-            device.lockForConfiguration(&err)
-            if err != nil {return}
-            if on {
-                device.flashMode = AVCaptureFlashModeOn
-                device.torchMode = AVCaptureTorchModeOn
-            } else {
-                device.flashMode = AVCaptureFlashModeOff
-                device.torchMode = AVCaptureTorchModeOff
+        guard let device : AVCaptureDevice = AVCaptureDevice.default(for: AVMediaType.video) else { return }
+                
+        if device.hasFlash && device.hasTorch
+        {
+            do
+            {
+                try device.lockForConfiguration()
+                if on
+                {
+                    device.flashMode = .on
+                    device.torchMode = .on
+                }
+                else
+                {
+                    device.flashMode = .off
+                    device.torchMode = .off
+                }
+                
+                device.unlockForConfiguration()
             }
-            device.unlockForConfiguration()
+            catch
+            {
+                
+            }
         }
     }
 }
