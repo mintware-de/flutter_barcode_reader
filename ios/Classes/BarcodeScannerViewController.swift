@@ -4,7 +4,7 @@ import UIKit
 protocol BarcodeScannerViewControllerDelegate : NSObjectProtocol 
 {
     func barcodeScannerViewController(_ controller: BarcodeScannerViewController?, didScanBarcodeWithResult result: String?)
-    func barcodeScannerViewController(_ controller: BarcodeScannerViewController?, didFailWithErrorCode errorCode: String?)
+    func barcodeScannerViewController(_ controller: BarcodeScannerViewController?, didFailWithErrorCode errorCode: String)
 }
 
 class BarcodeScannerNavigationController : UINavigationController
