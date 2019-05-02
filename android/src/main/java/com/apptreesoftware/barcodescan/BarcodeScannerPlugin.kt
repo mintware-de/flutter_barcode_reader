@@ -22,7 +22,8 @@ class BarcodeScannerPlugin(val activity: Activity): MethodCallHandler,
     }
   }
 
-  override fun onMethodCall(call: MethodCall, result: Result): Unit {
+  override fun onMethodCall(call: MethodCall, result: Result): Unit
+  {
     if (call.method.equals("scan")) {
       this.result = result
       showBarcodeView()
@@ -31,17 +32,23 @@ class BarcodeScannerPlugin(val activity: Activity): MethodCallHandler,
     }
   }
 
-  private fun showBarcodeView() {
+  private fun showBarcodeView()
+  {
     val intent = Intent(activity, BarcodeScannerActivity::class.java)
     activity.startActivityForResult(intent, 100)
   }
 
-  override fun onActivityResult(code: Int, resultCode: Int, data: Intent?): Boolean {
-    if (code == 100) {
-      if (resultCode == Activity.RESULT_OK) {
+  override fun onActivityResult(code: Int, resultCode: Int, data: Intent?): Boolean
+  {
+    if (code == 100)
+    {
+      if (resultCode == Activity.RESULT_OK)
+	  {
         val barcode = data?.getStringExtra("SCAN_RESULT")
         barcode?.let { this.result?.success(barcode) }
-      } else {
+      }
+	  else
+	  {
         val errorCode = data?.getStringExtra("ERROR_CODE")
         this.result?.error(errorCode, null, null)
       }

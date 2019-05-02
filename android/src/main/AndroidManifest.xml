@@ -3,7 +3,9 @@
 
   <uses-permission android:name="android.permission.CAMERA" />
 
-  <application>
+  <application
+      android:theme = "@style/no_action_bar"
+      >
     <activity android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity" />
   </application>
 </manifest>
