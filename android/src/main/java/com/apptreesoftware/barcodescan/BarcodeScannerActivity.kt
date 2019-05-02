@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.*
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -75,10 +76,15 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 			flashButton.text = "Flash On"
 	}
 
-	fun clickedClose(v:View)
+	fun clickedClose(v:View?)
 	{
 		scannerView.setResultHandler(null)
 		finishWithError("")
+	}
+
+	override fun onBackPressed()
+	{
+		clickedClose(null)
 	}
 
     override fun handleResult(result: Result?) {
@@ -171,17 +177,21 @@ class BarcodeScannerViewFinder : View, IViewFinder
 	private val mDefaultLaserColor = resources.getColor(R.color.viewfinder_laser)
 	private val mDefaultMaskColor = resources.getColor(R.color.viewfinder_mask)
 	private val mDefaultBorderColor = resources.getColor(R.color.viewfinder_border)
+	private val mDefaultClearColor = resources.getColor(R.color.viewfinder_clear)
 	private val mDefaultBorderStrokeWidth = resources.getInteger(R.integer.viewfinder_border_width)
 	private val mDefaultBorderLineLength = resources.getInteger(R.integer.viewfinder_border_length)
 
 	protected var mLaserPaint : Paint
-	protected var mFinderMaskPaint: Paint
-	protected var mBorderPaint: Paint
+	protected var mFinderMaskPaint : Paint
+	protected var mBorderPaint : Paint
+	protected var mClearPaint : Paint
 	protected var mBorderLineLength: Int = 0
 	protected var mSquareViewFinder: Boolean = false
 	private var mIsLaserEnabled: Boolean = true
 	private var mBordersAlpha: Float = 0.toFloat()
 	private var mViewFinderOffset = 0
+
+	private val cornerRadius : Float = 30.0f
 
 	constructor(context: Context) : super(context)
 
@@ -197,6 +207,13 @@ class BarcodeScannerViewFinder : View, IViewFinder
 		//finder mask paint
 		mFinderMaskPaint = Paint()
 		mFinderMaskPaint.color = mDefaultMaskColor
+
+		mClearPaint = Paint()
+		mClearPaint.color = mDefaultClearColor
+		mClearPaint.style = Paint.Style.STROKE
+		mClearPaint.strokeWidth = mDefaultBorderStrokeWidth.toFloat()
+		mClearPaint.isAntiAlias = true
+		mClearPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
 
 		//border paint
 		mBorderPaint = Paint()
@@ -302,44 +319,52 @@ class BarcodeScannerViewFinder : View, IViewFinder
 
 	fun drawViewFinderMask(canvas: Canvas)
 	{
-		val width = canvas.width
-		val height = canvas.height
-		val framingRect = framingRect
-
-		canvas.drawRect(0f, 0f, width.toFloat(), framingRect!!.top.toFloat(), mFinderMaskPaint)
-		canvas.drawRect(0f, framingRect.top.toFloat(), framingRect.left.toFloat(), (framingRect.bottom + 1).toFloat(), mFinderMaskPaint)
-		canvas.drawRect((framingRect.right + 1).toFloat(), framingRect.top.toFloat(), width.toFloat(), (framingRect.bottom + 1).toFloat(), mFinderMaskPaint)
-		canvas.drawRect(0f, (framingRect.bottom + 1).toFloat(), width.toFloat(), height.toFloat(), mFinderMaskPaint)
+//		val width = canvas.width
+//		val height = canvas.height
+//		val framingRect = framingRect
+//
+//		canvas.drawRect(0f, 0f, width.toFloat(), framingRect!!.top.toFloat(), mFinderMaskPaint)
+//		canvas.drawRect(0f, framingRect.top.toFloat(), framingRect.left.toFloat(), (framingRect.bottom + 1).toFloat(), mFinderMaskPaint)
+//		canvas.drawRect((framingRect.right + 1).toFloat(), framingRect.top.toFloat(), width.toFloat(), (framingRect.bottom + 1).toFloat(), mFinderMaskPaint)
+//		canvas.drawRect(0f, (framingRect.bottom + 1).toFloat(), width.toFloat(), height.toFloat(), mFinderMaskPaint)
 	}
 
 	fun drawViewFinderBorder(canvas: Canvas)
 	{
-		val framingRect = framingRect
+		val holeRect = framingRect ?: return
+		val cornerSize = mBorderLineLength.toFloat()
 
-		// Top-left corner
+		val holeRectF = RectF(holeRect)
+		val pathBorder = Path()
+		pathBorder.addRoundRect(holeRectF,cornerRadius,cornerRadius,Path.Direction.CW)
+		canvas.drawPath(pathBorder,mBorderPaint)
+
 		val path = Path()
-		path.moveTo(framingRect!!.left.toFloat(), (framingRect.top + mBorderLineLength).toFloat())
-		path.lineTo(framingRect.left.toFloat(), framingRect.top.toFloat())
-		path.lineTo((framingRect.left + mBorderLineLength).toFloat(), framingRect.top.toFloat())
-		canvas.drawPath(path, mBorderPaint)
 
-		// Top-right corner
-		path.moveTo(framingRect.right.toFloat(), (framingRect.top + mBorderLineLength).toFloat())
-		path.lineTo(framingRect.right.toFloat(), framingRect.top.toFloat())
-		path.lineTo((framingRect.right - mBorderLineLength).toFloat(), framingRect.top.toFloat())
-		canvas.drawPath(path, mBorderPaint)
+		val x = holeRect.left.toFloat()
+		val y = holeRect.top.toFloat()
+		val w = holeRect.width().toFloat()
+		val h = holeRect.height().toFloat()
 
-		// Bottom-right corner
-		path.moveTo(framingRect.right.toFloat(), (framingRect.bottom - mBorderLineLength).toFloat())
-		path.lineTo(framingRect.right.toFloat(), framingRect.bottom.toFloat())
-		path.lineTo((framingRect.right - mBorderLineLength).toFloat(), framingRect.bottom.toFloat())
-		canvas.drawPath(path, mBorderPaint)
+		path.moveTo(x + cornerSize,y)
+		path.lineTo(x+w-cornerSize,y)
 
-		// Bottom-left corner
-		path.moveTo(framingRect.left.toFloat(), (framingRect.bottom - mBorderLineLength).toFloat())
-		path.lineTo(framingRect.left.toFloat(), framingRect.bottom.toFloat())
-		path.lineTo((framingRect.left + mBorderLineLength).toFloat(), framingRect.bottom.toFloat())
-		canvas.drawPath(path, mBorderPaint)
+		path.moveTo(x+cornerSize,y+h)
+		path.lineTo(x+w-cornerSize,y+h)
+
+		path.moveTo(x,y+cornerSize)
+		path.lineTo(x,y+h-cornerSize)
+
+		path.moveTo(x+w,y+cornerSize)
+		path.lineTo(x+w,y+h-cornerSize)
+
+		canvas.drawPath(path, mClearPaint)
+
+//		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+//		{
+//			pathBorder.op(path,Path.Op.REVERSE_DIFFERENCE)
+//			canvas.drawPath(pathBorder, mBorderPaint)
+//		}
 	}
 
 	fun drawLaser(canvas: Canvas)

@@ -6,6 +6,8 @@
   <application
       android:theme = "@style/no_action_bar"
       >
-    <activity android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity" />
+    <activity
+        android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity"
+        />
   </application>
 </manifest>
