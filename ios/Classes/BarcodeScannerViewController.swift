@@ -124,6 +124,7 @@ class BarcodeScannerViewController: UIViewController
             self.scanner?.previewLayer.frame = CGRect(x:origin.x,y:origin.y,width: size.width,height: size.height)
             
             self.scanRect?.stopAnimating()
+            self.scanRect?.layoutSubviews()
 
             guard let scanner = self.scanner else { return }
             if scanner.isScanning()
@@ -132,9 +133,8 @@ class BarcodeScannerViewController: UIViewController
                 scanner.stopScanning()                
             }
         }, completion:{ (context:UIViewControllerTransitionCoordinatorContext!)
-            in
-            self.scanRect?.setNeedsDisplay()
-            self.scanRect?.setNeedsLayout()
+            in            
+            self.scanRect?.setNeedsDisplay()            
             self.scanRect?.startAnimating()
             if self.wasScanning
             {
