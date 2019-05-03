@@ -23,7 +23,7 @@ class BarcodeScannerViewController: UIViewController
 {
     var previewView : UIView?
     var scanRect : ScannerOverlay?
-    var scanner : MTBBarcodeScanner?
+    var scanner : MTBBarcodeScanner?    
     weak var delegate : BarcodeScannerViewControllerDelegate?
     
     private var closeButton : UIBarButtonItem?
@@ -60,7 +60,7 @@ class BarcodeScannerViewController: UIViewController
         updateFlashButton()
         
         let close = UIBarButtonItem(barButtonSystemItem:.cancel, target:self, action:#selector(cancel))
-        let flash = UIBarButtonItem(title:"FLASH ON", style:.plain, target:self, action:#selector(toggle))
+        let flash = UIBarButtonItem(title:"Flash On", style:.plain, target:self, action:#selector(toggle))
         let flex = UIBarButtonItem(barButtonSystemItem:.flexibleSpace, target:nil, action:nil)
         toolbarItems = [close,flex,flash]
         closeButton = close
@@ -123,14 +123,19 @@ class BarcodeScannerViewController: UIViewController
             let origin:CGPoint = self.view.frame.origin
             self.scanner?.previewLayer.frame = CGRect(x:origin.x,y:origin.y,width: size.width,height: size.height)
             
+            scanRect?.stopAnimating()
+
             guard let scanner = self.scanner else { return }
             if scanner.isScanning()
             {
                 self.wasScanning = true
-                scanner.stopScanning()
+                scanner.stopScanning()                
             }
         }, completion:{ (context:UIViewControllerTransitionCoordinatorContext!)
             in
+            scanRect?.setNeedsDisplay()
+            scanRect?.setNeedsLayout()
+            scanRect?.startAnimating()
             if self.wasScanning
             {
                 self.startScan()
