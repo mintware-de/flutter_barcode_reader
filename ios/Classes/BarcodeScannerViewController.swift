@@ -176,9 +176,9 @@ class BarcodeScannerViewController: UIViewController
             return
         }
         if self.isFlashOn() {
-            self.flashButton?.title = "FLASH OFF"
+            self.flashButton?.title = "Flash Off"
         } else {
-            self.flashButton?.title = "FLASH ON"
+            self.flashButton?.title = "Flash On"
         }
     }
     

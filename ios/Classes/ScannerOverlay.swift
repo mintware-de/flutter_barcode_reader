@@ -18,11 +18,12 @@ class ScannerOverlay: UIView
     {
         let rect: CGRect = frame
         let heightMultiplier: CGFloat = 3.0 / 4.0 // 4:3 aspect ratio
-        let scanRectWidth: CGFloat = rect.size.width * 0.8
-        let scanRectHeight: CGFloat = scanRectWidth * heightMultiplier
-        let scanRectOriginX: CGFloat = (rect.size.width / 2) - (scanRectWidth / 2)
-        let scanRectOriginY: CGFloat = (rect.size.height / 2) - (scanRectHeight / 2)
-        return CGRect(x: scanRectOriginX, y: scanRectOriginY, width: scanRectWidth, height: scanRectHeight)
+        let w: CGFloat = min(rect.width,rect.height) * 0.8
+        let h: CGFloat = w * heightMultiplier
+        let x: CGFloat = (rect.width / 2) - (w / 2)
+        let y: CGFloat = (rect.height / 2) - (h / 2)
+        let ret = CGRect(x:x,y:y,width:w,height:h)
+        return ret
     }
     
     func startAnimating()
@@ -64,17 +65,17 @@ class ScannerOverlay: UIView
     
     override func draw(_ rect: CGRect)
     {
-        //        let context = UIGraphicsGetCurrentContext()
+//        let context = UIGraphicsGetCurrentContext()
         
-        //        let overlayColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.55)
+//        let overlayColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.55)
         
-        //        context?.setFillColor(overlayColor.cgColor)
-        //        context?.fill(bounds)
+//        context?.setFillColor(overlayColor.cgColor)
+//        context?.fill(bounds)
         
         // make a hole for the scanner
         let holeRect: CGRect = scanRect()
         let holeRectIntersection: CGRect = holeRect.intersection(rect)
-        //        UIColor.clear.setFill()
+//        UIColor.clear.setFill()
         
         //        let roundedHole = UIBezierPath(roundedRect: holeRectIntersection, cornerRadius: 15.0)
         //        roundedHole.fill()
@@ -106,7 +107,7 @@ class ScannerOverlay: UIView
         path.addLine(to: CGPoint(x:holeRect.origin.x+holeRect.width, y: holeRect.origin.y+holeRect.height-cornerSize))
         
         path.lineWidth = 3
-        //        UIColor.clear.setStroke()
+//        UIColor.clear.setStroke()
         path.stroke(with:.clear,alpha:1)
     }
 }
