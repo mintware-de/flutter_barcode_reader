@@ -166,7 +166,7 @@ class BarcodeScannerViewController: UIViewController
     @objc
     func cancel()
     {
-        self.dismiss(animated: true, completion:nil)
+        self.dismiss(animated:false, completion:nil)
     }
     
     func updateFlashButton()
