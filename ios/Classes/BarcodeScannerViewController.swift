@@ -77,6 +77,7 @@ class BarcodeScannerViewController: UIViewController
         navigationController?.toolbar.tintColor = .white
         navigationController?.toolbar.isTranslucent = true
         navigationController?.toolbar.setBackgroundImage(UIImage(),forToolbarPosition:.any,barMetrics:.default)
+        navigationController?.toolbar.setShadowImage(UIImage(),forToolbarPosition:.any)        
         navigationController?.toolbar.backgroundColor = .clear
     }
     
