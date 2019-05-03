@@ -2,6 +2,9 @@ import UIKit
 
 class ScannerOverlay: UIView
 {
+    let cornerRadius : CGFloat = 30
+    let cornerSize : CGFloat = 60
+    
     var line = UIView()
     
     var scanLineRect : CGRect
@@ -52,6 +55,8 @@ class ScannerOverlay: UIView
     
     private func setup()
     {
+        backgroundColor = .clear
+        
         line.backgroundColor = UIColor.red
         line.translatesAutoresizingMaskIntoConstraints = false
         addSubview(line)
@@ -59,33 +64,33 @@ class ScannerOverlay: UIView
     
     override func draw(_ rect: CGRect)
     {
-        let context = UIGraphicsGetCurrentContext()
+        //        let context = UIGraphicsGetCurrentContext()
         
-        let overlayColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.55)
+        //        let overlayColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.55)
         
-        context?.setFillColor(overlayColor.cgColor)
-        context?.fill(bounds)
+        //        context?.setFillColor(overlayColor.cgColor)
+        //        context?.fill(bounds)
         
         // make a hole for the scanner
         let holeRect: CGRect = scanRect()
         let holeRectIntersection: CGRect = holeRect.intersection(rect)
-        UIColor.clear.setFill()
+        //        UIColor.clear.setFill()
         
-//        let roundedHole = UIBezierPath(roundedRect: holeRectIntersection, cornerRadius: 15.0)
-//        roundedHole.fill()
+        //        let roundedHole = UIBezierPath(roundedRect: holeRectIntersection, cornerRadius: 15.0)
+        //        roundedHole.fill()
         //UIRectFill(holeRectIntersection);
         
         // draw a horizontal line over the middle
         let lineRect: CGRect = scanLineRect
         line.frame = lineRect
         
-        let cornerspath = UIBezierPath(roundedRect: holeRectIntersection, cornerRadius: 30)
+        let cornerspath = UIBezierPath(roundedRect: holeRectIntersection, cornerRadius: cornerRadius)
         cornerspath.lineWidth = 3
         UIColor.white.setStroke()
         cornerspath.stroke()
         
-        // drw the green corners
-        let cornerSize: CGFloat = 60
+        
+        
         let path = UIBezierPath()
         
         path.move(to: CGPoint(x: holeRect.origin.x+cornerSize, y: holeRect.origin.y))
@@ -101,7 +106,7 @@ class ScannerOverlay: UIView
         path.addLine(to: CGPoint(x:holeRect.origin.x+holeRect.width, y: holeRect.origin.y+holeRect.height-cornerSize))
         
         path.lineWidth = 3
-        UIColor.clear.setStroke()
+        //        UIColor.clear.setStroke()
         path.stroke(with:.clear,alpha:1)
     }
 }
