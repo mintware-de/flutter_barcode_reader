@@ -15,7 +15,7 @@ public class SwiftBarcodeScannerPlugin : NSObject,FlutterPlugin,BarcodeScannerVi
     {
         switch call.method
         {
-            case "scan": self.showBarcodeView(result)
+            case "scan": self.showBarcodeView(call.arguments as? [String:Any],result)
             default: result(FlutterMethodNotImplemented)
         }
     }
@@ -23,10 +23,10 @@ public class SwiftBarcodeScannerPlugin : NSObject,FlutterPlugin,BarcodeScannerVi
     var hostViewController : UIViewController?
     var callback : ((Any?)->())?
 
-    func showBarcodeView(_ result:@escaping FlutterResult)
+    func showBarcodeView(_ arguments:[String:Any]?,_ result:@escaping FlutterResult)
     {
         callback = result
-        let scannerViewController = BarcodeScannerViewController()
+        let scannerViewController = BarcodeScannerViewController(arguments:arguments)
         let nav = BarcodeScannerNavigationController(rootViewController:scannerViewController)        
         scannerViewController.delegate = self
         hostViewController?.present(nav,animated:false,completion:nil)

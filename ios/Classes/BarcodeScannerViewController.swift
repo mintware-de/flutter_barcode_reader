@@ -31,6 +31,25 @@ class BarcodeScannerViewController: UIViewController
     
     private var wasScanning : Bool = false
     
+    var kFlashOn = "Flash On"
+    var kFlashOff = "Flash Off"
+    
+    convenience init(arguments:[String:Any]?)
+    {
+        self.init()
+        if let str = arguments?["strings"] as? [String:String]
+        {
+            if let flashOn = str["btn_flash_on"]
+            {
+                kFlashOn = flashOn
+            }
+            if let flashOff = str["btn_flash_off"]
+            {
+                kFlashOff = flashOff
+            }
+        }
+    }
+    
     func prefersStatusBarHidden() -> Bool
     {
         return true
@@ -60,7 +79,7 @@ class BarcodeScannerViewController: UIViewController
         updateFlashButton()
         
         let close = UIBarButtonItem(barButtonSystemItem:.cancel, target:self, action:#selector(cancel))
-        let flash = UIBarButtonItem(title:"Flash On", style:.plain, target:self, action:#selector(toggle))
+        let flash = UIBarButtonItem(title:kFlashOn, style:.plain, target:self, action:#selector(toggle))
         let flex = UIBarButtonItem(barButtonSystemItem:.flexibleSpace, target:nil, action:nil)
         toolbarItems = [close,flex,flash]
         closeButton = close
@@ -182,9 +201,9 @@ class BarcodeScannerViewController: UIViewController
             return
         }
         if self.isFlashOn() {
-            self.flashButton?.title = "Flash Off"
+            self.flashButton?.title = kFlashOff
         } else {
-            self.flashButton?.title = "Flash On"
+            self.flashButton?.title = kFlashOn
         }
     }
     

@@ -34,6 +34,9 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
     }
 
+	var kFlashOn = "Flash On"
+	var kFlashOff = "Flash Off"
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -42,6 +45,18 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 
         setContentView(R.layout.activity_barcodescanner)
 
+		var arguments : HashMap<String,Any>? = intent.getSerializableExtra("arguments") as? HashMap<String, Any>
+		var strings = arguments?.get("strings") as? HashMap<String,String>
+		if (strings!=null)
+		{
+			var flashOn = strings.get("btn_flash_on")
+			if (flashOn != null)
+				kFlashOn = flashOn
+			var flashOff = strings.get("btn_flash_off")
+			if (flashOff != null)
+				kFlashOff = flashOff
+		}
+
         scannerView = BarcodeScannerLayout(this)
 
 		camera = findViewById(R.id.camera)
@@ -49,6 +64,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 
 		closeButton = findViewById(R.id.close_button)
 		flashButton = findViewById(R.id.flash_button)
+
+		flashButton.text = kFlashOn
     }
 
     override fun onResume()
@@ -71,9 +88,9 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 	{
 		scannerView.flash = !scannerView.flash
 		if (scannerView.flash)
-			flashButton.text = "Flash Off"
+			flashButton.text = kFlashOff
 		else
-			flashButton.text = "Flash On"
+			flashButton.text = kFlashOn
 	}
 
 	fun clickedClose(v:View?)

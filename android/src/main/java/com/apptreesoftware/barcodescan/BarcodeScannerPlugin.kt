@@ -24,17 +24,22 @@ class BarcodeScannerPlugin(val activity: Activity): MethodCallHandler,
 
   override fun onMethodCall(call: MethodCall, result: Result): Unit
   {
-    if (call.method.equals("scan")) {
+    if (call.method.equals("scan"))
+    {
       this.result = result
-      showBarcodeView()
-    } else {
+      showBarcodeView(call.arguments as? HashMap<String,Any>)
+    }
+    else
+    {
       result.notImplemented()
     }
   }
 
-  private fun showBarcodeView()
+  private fun showBarcodeView(arguments:HashMap<String,Any>?)
   {
     val intent = Intent(activity, BarcodeScannerActivity::class.java)
+    if (arguments != null)
+      intent.putExtra("arguments",arguments)
     activity.startActivityForResult(intent, 100)
   }
 
