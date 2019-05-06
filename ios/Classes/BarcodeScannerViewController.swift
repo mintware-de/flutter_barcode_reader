@@ -78,7 +78,7 @@ class BarcodeScannerViewController: UIViewController
         scanner = MTBBarcodeScanner(previewView:pv)
         updateFlashButton()
         
-        let close = UIBarButtonItem(barButtonSystemItem:.cancel, target:self, action:#selector(cancel))
+        let close = UIBarButtonItem(title:"X", style:.plain, target:self, action:#selector(cancel))
         let flash = UIBarButtonItem(title:kFlashOn, style:.plain, target:self, action:#selector(toggle))
         let flex = UIBarButtonItem(barButtonSystemItem:.flexibleSpace, target:nil, action:nil)
         toolbarItems = [close,flex,flash]
