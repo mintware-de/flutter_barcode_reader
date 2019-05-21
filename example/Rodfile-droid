@@ -1,0 +1,12 @@
+#  w,h,sfile,png
+#  w,h,sfile,png|white->black
+#  w,sfile,png
+#  w,sfile
+#  method,w,h,sfile,png
+#  method,w,sfile,png
+
+### OUTPUT=android/app/src/main/res/
+### INPUT=raw
+### PLATFORM=droid
+
+24,24,baseline-close-24px.svg,button_barcodescanner_close.png
