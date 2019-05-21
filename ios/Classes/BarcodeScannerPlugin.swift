@@ -10,7 +10,7 @@ public class SwiftBarcodeScannerPlugin : NSObject,FlutterPlugin,BarcodeScannerVi
         instance.hostViewController = UIApplication.shared.delegate?.window??.rootViewController
         registrar.addMethodCallDelegate(instance,channel:channel)
     }
-    
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult)
     {
         switch call.method

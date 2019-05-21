@@ -7,6 +7,11 @@ protocol BarcodeScannerViewControllerDelegate : NSObjectProtocol
     func barcodeScannerViewController(_ controller: BarcodeScannerViewController?, didFailWithErrorCode errorCode: String)
 }
 
+enum BarcodeScannerImage
+{
+    case closeButton
+}
+
 class BarcodeScannerNavigationController : UINavigationController
 {
     func prefersStatusBarHidden() -> Bool {
@@ -33,6 +38,7 @@ class BarcodeScannerViewController: UIViewController
     
     var kFlashOn = "Flash On"
     var kFlashOff = "Flash Off"
+    var kClose = "Close"
     
     convenience init(arguments:[String:Any]?)
     {
@@ -46,6 +52,10 @@ class BarcodeScannerViewController: UIViewController
             if let flashOff = str["btn_flash_off"]
             {
                 kFlashOff = flashOff
+            }
+            if let close = str["btn_close"]
+            {
+                kClose = close
             }
         }
     }
@@ -77,8 +87,17 @@ class BarcodeScannerViewController: UIViewController
         
         scanner = MTBBarcodeScanner(previewView:pv)
         updateFlashButton()
-        
-        let close = UIBarButtonItem(title:"X", style:.plain, target:self, action:#selector(cancel))
+
+        func createCloseButton() -> UIBarButtonItem
+        {
+            if let img = UIImage(named:"button_barcodescanner_close")?.withRenderingMode(.alwaysTemplate)
+            {
+                return UIBarButtonItem(image:img, style:.plain, target:self, action:#selector(cancel))
+            }
+            return UIBarButtonItem(title:kClose, style:.plain, target:self, action:#selector(cancel))
+        }
+
+        let close = createCloseButton()
         let flash = UIBarButtonItem(title:kFlashOn, style:.plain, target:self, action:#selector(toggle))
         let flex = UIBarButtonItem(barButtonSystemItem:.flexibleSpace, target:nil, action:nil)
         toolbarItems = [close,flex,flash]
@@ -93,11 +112,10 @@ class BarcodeScannerViewController: UIViewController
         navigationController?.isToolbarHidden = false
         navigationController?.setNavigationBarHidden(true, animated:false)
         
+        navigationController?.toolbar.barStyle = .black
         navigationController?.toolbar.tintColor = .white
         navigationController?.toolbar.isTranslucent = true
-        navigationController?.toolbar.setBackgroundImage(UIImage(),forToolbarPosition:.any,barMetrics:.default)
-        navigationController?.toolbar.setShadowImage(UIImage(),forToolbarPosition:.any)        
-        navigationController?.toolbar.backgroundColor = .clear
+        navigationController?.toolbar.setShadowImage(UIImage(),forToolbarPosition:.any)
     }
     
     override func viewDidAppear(_ animated:Bool)
