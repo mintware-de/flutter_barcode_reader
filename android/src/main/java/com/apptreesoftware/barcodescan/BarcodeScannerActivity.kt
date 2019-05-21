@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import com.google.zxing.Result
 import com.yourcompany.barcodescan.R
@@ -26,7 +27,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
     lateinit var scannerView : BarcodeScannerLayout
 
 	lateinit var camera : LinearLayout
-	lateinit var closeButton : Button
+	lateinit var closeButton : ImageButton
 	lateinit var flashButton : Button
 
     companion object

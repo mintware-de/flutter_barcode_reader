@@ -17,27 +17,37 @@
 
         </LinearLayout>
 
-        <Button
-            style="@style/camera_button"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"
+            android:background="#40000000"
+            >
+
+        <ImageButton
+            style="@style/camera_button_image"
             android:id="@+id/close_button"
             android:layout_marginLeft="16dp"
-            android:layout_alignParentLeft="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="X"
+            android:src="@drawable/button_barcodescanner_close"
             android:onClick="clickedClose"
-            ></Button>
+            ></ImageButton>
+
+            <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1"/>
 
         <Button
-            style="@style/camera_button"
+            style="@style/camera_button_text"
             android:id="@+id/flash_button"
             android:layout_marginRight="16dp"
-            android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Flash On"
             android:onClick="clickedToggleFlash"
             ></Button>
+
+        </LinearLayout>
 
     </RelativeLayout>
 
