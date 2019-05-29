@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -38,6 +39,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 	var kFlashOn = "Flash On"
 	var kFlashOff = "Flash Off"
 
+	private var dismissAutomaticallyOnResult = true
+
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
@@ -57,9 +60,13 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 			if (flashOff != null)
 				kFlashOff = flashOff
 		}
+		val dismiss = arguments?.get("dismiss_automatically") as? Boolean
+		if (dismiss != null)
+		{
+			dismissAutomaticallyOnResult = dismiss
+		}
 
         scannerView = BarcodeScannerLayout(this)
-
 		camera = findViewById(R.id.camera)
 		camera.addView(scannerView)
 
@@ -105,14 +112,25 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler
 		clickedClose(null)
 	}
 
-    override fun handleResult(result: Result?) {
+    override fun handleResult(result: Result?)
+	{
+		val vf = scannerView.viewFinder
+		if (vf != null)
+		{
+			if (vf.isTouching)
+				return
+		}
+		// TODO: if dismiss automatically on result is true, i dont think this will work the way intended, might need to use a broadcaster to send a notification out to listeners, or move the plugin stuff into here, so the activity can send the messages
+		// back to the flutter app
         val intent = Intent()
         intent.putExtra("SCAN_RESULT", result.toString())
         setResult(RESULT_OK, intent)
-        finish()
+		if (dismissAutomaticallyOnResult)
+        	finish()
     }
 
-    fun finishWithError(errorCode: String) {
+    fun finishWithError(errorCode: String)
+	{
         val intent = Intent()
         intent.putExtra("ERROR_CODE", errorCode)
         setResult(RESULT_CANCELED, intent)
@@ -173,6 +191,8 @@ object PermissionUtil {
 
 class BarcodeScannerLayout(context: Context?) : me.dm7.barcodescanner.zxing.ZXingScannerView(context)
 {
+	var viewFinder : BarcodeScannerViewFinder? = null
+
 	init
 	{
 		setAutoFocus(true)
@@ -182,13 +202,14 @@ class BarcodeScannerLayout(context: Context?) : me.dm7.barcodescanner.zxing.ZXin
 
 	override fun createViewFinderView(context: Context): IViewFinder
 	{
-		return BarcodeScannerViewFinder(context)
+		val vf = BarcodeScannerViewFinder(context)
+		viewFinder = vf
+		return vf
 	}
 }
 
-class BarcodeScannerViewFinder : View, IViewFinder
+class BarcodeScannerViewFinder : View, IViewFinder, View.OnTouchListener
 {
-
 	private var mFramingRect: Rect? = null
 	private var scannerAlpha: Int = 0
 
@@ -199,12 +220,13 @@ class BarcodeScannerViewFinder : View, IViewFinder
 	private val mDefaultBorderStrokeWidth = resources.getInteger(R.integer.viewfinder_border_width)
 	private val mDefaultBorderLineLength = resources.getInteger(R.integer.viewfinder_border_length)
 
-	protected var mLaserPaint : Paint
-	protected var mFinderMaskPaint : Paint
-	protected var mBorderPaint : Paint
-	protected var mClearPaint : Paint
-	protected var mBorderLineLength: Int = 0
-	protected var mSquareViewFinder: Boolean = false
+	private var mLaserPaint : Paint
+	private var mFinderMaskPaint : Paint
+	private var mBorderPaint : Paint
+	private var mBorderDisabledPaint : Paint
+	private var mClearPaint : Paint
+	private var mBorderLineLength: Int = 0
+	private var mSquareViewFinder: Boolean = false
 	private var mIsLaserEnabled: Boolean = true
 	private var mBordersAlpha: Float = 0.toFloat()
 	private var mViewFinderOffset = 0
@@ -240,7 +262,56 @@ class BarcodeScannerViewFinder : View, IViewFinder
 		mBorderPaint.strokeWidth = mDefaultBorderStrokeWidth.toFloat()
 		mBorderPaint.isAntiAlias = true
 
+		mBorderDisabledPaint = Paint()
+		mBorderDisabledPaint.color = mDefaultLaserColor
+		mBorderDisabledPaint.style = Paint.Style.STROKE
+		mBorderDisabledPaint.strokeWidth = mDefaultBorderStrokeWidth.toFloat()
+		mBorderDisabledPaint.isAntiAlias = true
+
 		mBorderLineLength = mDefaultBorderLineLength
+	}
+
+	override fun onAttachedToWindow()
+	{
+		super.onAttachedToWindow()
+		setOnTouchListener(this)
+	}
+
+	override fun onDetachedFromWindow()
+	{
+		super.onDetachedFromWindow()
+		setOnTouchListener(null)
+	}
+
+	override fun onTouch(v: View?, event: MotionEvent?) : Boolean
+	{
+		val ev = event ?: return true
+		when(ev.action)
+		{
+			MotionEvent.ACTION_UP -> isTouching = false
+			MotionEvent.ACTION_DOWN -> isTouching = true
+			MotionEvent.ACTION_MOVE -> isTouching = true
+			MotionEvent.ACTION_CANCEL -> isTouching = false
+			MotionEvent.ACTION_OUTSIDE -> isTouching = false
+			else -> {}
+		}
+		return true
+	}
+
+	private var touching = false
+	var isTouching : Boolean
+	get()
+	{
+		return touching
+	}
+	private set(value)
+	{
+		val changed = value != touching
+		touching = value
+		if(changed)
+		{
+			invalidate()
+		}
 	}
 
 	override fun setLaserColor(laserColor: Int)
@@ -329,7 +400,7 @@ class BarcodeScannerViewFinder : View, IViewFinder
 		drawViewFinderMask(canvas)
 		drawViewFinderBorder(canvas)
 
-		if (mIsLaserEnabled)
+		if (mIsLaserEnabled && !touching)
 		{
 			drawLaser(canvas)
 		}
@@ -355,7 +426,10 @@ class BarcodeScannerViewFinder : View, IViewFinder
 		val holeRectF = RectF(holeRect)
 		val pathBorder = Path()
 		pathBorder.addRoundRect(holeRectF,cornerRadius,cornerRadius,Path.Direction.CW)
-		canvas.drawPath(pathBorder,mBorderPaint)
+		if (touching)
+			canvas.drawPath(pathBorder,mBorderDisabledPaint)
+		else
+			canvas.drawPath(pathBorder,mBorderPaint)
 
 		val path = Path()
 
