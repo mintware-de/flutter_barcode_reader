@@ -7,14 +7,16 @@ class ScannerOverlay: UIView
     
     var line = UIView()
     
+    private var touching = false
+    
     var scanLineRect : CGRect
     {
-        let scanRect : CGRect = self.scanRect()
+        let scanRect : CGRect = self.scanRect
         let rect : CGRect = frame
         return CGRect(x: scanRect.origin.x, y: rect.size.height / 2, width: scanRect.size.width, height: 1)
     }
     
-    func scanRect() -> CGRect
+    var scanRect : CGRect
     {
         let rect: CGRect = frame
         let heightMultiplier: CGFloat = 3.0 / 4.0 // 4:3 aspect ratio
@@ -63,6 +65,45 @@ class ScannerOverlay: UIView
         addSubview(line)
     }
     
+    private(set) var isTouching : Bool
+    {
+        get
+        {
+            return touching
+        }
+        set(value)
+        {
+            guard touching != value else { return }
+            touching = value
+            line.isHidden = value
+            setNeedsDisplay()
+        }
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
+    {
+        super.touchesBegan(touches,with:event)
+        isTouching = true
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?)
+    {
+        super.touchesMoved(touches,with:event)
+        isTouching = true
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?)
+    {
+        super.touchesEnded(touches,with:event)
+        isTouching = false
+    }
+    
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?)
+    {
+        super.touchesCancelled(touches,with:event)
+        isTouching = false
+    }
+    
     override func draw(_ rect: CGRect)
     {
 //        let context = UIGraphicsGetCurrentContext()
@@ -73,7 +114,7 @@ class ScannerOverlay: UIView
 //        context?.fill(bounds)
         
         // make a hole for the scanner
-        let holeRect: CGRect = scanRect()
+        let holeRect: CGRect = scanRect
         let holeRectIntersection: CGRect = holeRect.intersection(rect)
 //        UIColor.clear.setFill()
         
@@ -87,10 +128,8 @@ class ScannerOverlay: UIView
         
         let cornerspath = UIBezierPath(roundedRect: holeRectIntersection, cornerRadius: cornerRadius)
         cornerspath.lineWidth = 3
-        UIColor.white.setStroke()
+        touching ? UIColor.red.setStroke() : UIColor.white.setStroke()
         cornerspath.stroke()
-        
-        
         
         let path = UIBezierPath()
         

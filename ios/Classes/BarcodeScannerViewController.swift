@@ -27,7 +27,7 @@ class BarcodeScannerNavigationController : UINavigationController
 class BarcodeScannerViewController: UIViewController 
 {
     var previewView : UIView?
-    var scanRect : ScannerOverlay?
+    var overlay : ScannerOverlay?
     var scanner : MTBBarcodeScanner?    
     weak var delegate : BarcodeScannerViewControllerDelegate?
     
@@ -39,6 +39,8 @@ class BarcodeScannerViewController: UIViewController
     var kFlashOn = "Flash On"
     var kFlashOff = "Flash Off"
     var kClose = "Close"
+    
+    private var dismissAutomaticallyOnResult = true
     
     convenience init(arguments:[String:Any]?)
     {
@@ -57,6 +59,10 @@ class BarcodeScannerViewController: UIViewController
             {
                 kClose = close
             }
+        }
+        if let dismiss = arguments?["dismiss_automatically"] as? Bool
+        {
+            dismissAutomaticallyOnResult = dismiss
         }
     }
     
@@ -83,7 +89,7 @@ class BarcodeScannerViewController: UIViewController
         sr.backgroundColor = .clear
         view.addSubview(sr)
         sr.startAnimating()
-        scanRect = sr
+        overlay = sr
         
         scanner = MTBBarcodeScanner(previewView:pv)
         updateFlashButton()
@@ -143,6 +149,12 @@ class BarcodeScannerViewController: UIViewController
         }
     }
     
+    override func viewDidLayoutSubviews()
+    {
+        super.viewDidLayoutSubviews()
+        updateScanRect()
+    }
+    
     override func viewWillDisappear(_ animated:Bool)
     {
         self.scanner?.stopScanning()
@@ -161,8 +173,8 @@ class BarcodeScannerViewController: UIViewController
             let origin:CGPoint = self.view.frame.origin
             self.scanner?.previewLayer.frame = CGRect(x:origin.x,y:origin.y,width: size.width,height: size.height)
             
-            self.scanRect?.stopAnimating()
-            self.scanRect?.layoutSubviews()
+            self.overlay?.stopAnimating()
+            self.overlay?.layoutSubviews()
 
             guard let scanner = self.scanner else { return }
             if scanner.isScanning()
@@ -172,8 +184,8 @@ class BarcodeScannerViewController: UIViewController
             }
         }, completion:{ (context:UIViewControllerTransitionCoordinatorContext!)
             in            
-            self.scanRect?.setNeedsDisplay()            
-            self.scanRect?.startAnimating()
+            self.overlay?.setNeedsDisplay()
+            self.overlay?.startAnimating()
             if self.wasScanning
             {
                 self.startScan()
@@ -183,21 +195,43 @@ class BarcodeScannerViewController: UIViewController
         super.viewWillTransition(to:size, with:coordinator)
     }
     
+    func updateScanRect()
+    {
+        guard let scanner = scanner else { return }
+        guard let overlay = overlay else { return }
+        guard scanner.isScanning() else { return }
+        scanner.scanRect = overlay.scanRect
+    }
+    
     func startScan()
     {
         guard let scanner = scanner else { return }
         
         do
         {
+            scanner.didStartScanningBlock = {
+                self.updateScanRect()
+            }
+            
             try scanner.startScanning()
             { codes in
                 
-                guard let code = codes?.first else { return }
+                guard self.overlay?.isTouching == false else { return }
+                guard let codes = codes else { return }
+                guard let code = codes.first else { return }
                 
-                scanner.stopScanning()
+                let dismiss = self.dismissAutomaticallyOnResult
                 
+                if dismiss
+                {
+                    scanner.stopScanning()
+                    scanner.didStartScanningBlock = nil
+                }
                 self.delegate?.barcodeScannerViewController(self,didScanBarcodeWithResult:code.stringValue)
-                self.dismiss(animated:false, completion:nil)
+                if dismiss
+                {
+                    self.dismiss(animated:false, completion:nil)
+                }
             }
         }
         catch
