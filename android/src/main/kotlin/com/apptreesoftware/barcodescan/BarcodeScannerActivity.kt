@@ -22,6 +22,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
     private var clipboard: ClipboardManager? = null
+    private var pasteText: ClipData.Item? = null
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
@@ -58,17 +59,15 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         var pasteBtn = findViewById<Button>(R.id.PASTE)
         val intent = Intent()
         val clip = clipboard?.primaryClip
-        val pasteText = clip?.getItemAt(0)
-        if (pasteText?.text == null) {
-            pasteBtn.setVisibility(View.GONE)
-        } else {
-            pasteBtn.setOnClickListener {
-                intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
-                setResult(Activity.RESULT_OK, intent)
-                finish()
-            }
+        pasteText = clip?.getItemAt(0)
+        pasteBtn.setOnClickListener {
+            intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
+            setResult(Activity.RESULT_OK, intent)
+            finish()
         }
-
+        if (pasteText?.text == null) {
+            pasteBtn.setVisibility(View.INVISIBLE)
+        }
     }
 
     override fun onResume() {
@@ -77,6 +76,14 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         // start camera immediately if permission is already given
         if (!requestCameraAccessIfNecessary()) {
             scannerView.startCamera()
+        }
+        // show Paste Invoice button if there's a valid item in clipboard
+        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        val clip = clipboard?.primaryClip
+        pasteText = clip?.getItemAt(0)
+        if (pasteText?.text != null) {
+            var pasteBtn = findViewById<Button>(R.id.PASTE)
+            pasteBtn.setVisibility(View.VISIBLE)
         }
     }
 
