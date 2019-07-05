@@ -16,7 +16,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.widget.Button
 import android.view.View
-
+import android.content.ClipData
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
