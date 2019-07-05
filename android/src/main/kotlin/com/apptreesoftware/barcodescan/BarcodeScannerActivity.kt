@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.widget.Button
+import android.view.View
 
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
@@ -55,14 +56,17 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             this.invalidateOptionsMenu()
         }
         var pasteBtn = findViewById<Button>(R.id.PASTE)
-        pasteBtn.setOnClickListener {
-            val intent = Intent()
-            val clip = clipboard?.primaryClip
-            val pasteText = clip?.getItemAt(0)
-            val returnVal = if (pasteText?.text != null) pasteText?.text.toString() else ""
-            intent.putExtra("SCAN_RESULT", returnVal)
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+        val intent = Intent()
+        val clip = clipboard?.primaryClip
+        val pasteText = clip?.getItemAt(0)
+        if (pasteText?.text == null) {
+            pasteBtn.setVisibility(View.GONE)
+        } else {
+            pasteBtn.setOnClickListener {
+                intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
+                setResult(Activity.RESULT_OK, intent)
+                finish()
+            }
         }
 
     }
