@@ -59,7 +59,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             val intent = Intent()
             val clip = clipboard?.primaryClip
             val pasteText = clip?.getItemAt(0)
-            intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
+            val returnVal = if (pasteText?.text != null) pasteText?.text.toString() else ""
+            intent.putExtra("SCAN_RESULT", returnVal)
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
