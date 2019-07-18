@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets"/>
+  <PropertyGroup Label="UserMacros">
+    <FLUTTER_ROOT>D:\Softwares\Flutter_Path\flutter</FLUTTER_ROOT>
+    <FLUTTER_TARGET>lib/main.dart</FLUTTER_TARGET>
+    <PROJECT_DIR>D:\flutter_packages\flutter_barcode_reader\example</PROJECT_DIR>
+    <TRACK_WIDGET_CREATION>true</TRACK_WIDGET_CREATION>
+  </PropertyGroup>
+  <PropertyGroup/>
+  <ItemDefinitionGroup/>
+  <ItemGroup>
+    <BuildMacro Include="FLUTTER_ROOT">
+      <Value>$(FLUTTER_ROOT)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="FLUTTER_TARGET">
+      <Value>$(FLUTTER_TARGET)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="PROJECT_DIR">
+      <Value>$(PROJECT_DIR)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+    <BuildMacro Include="TRACK_WIDGET_CREATION">
+      <Value>$(TRACK_WIDGET_CREATION)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

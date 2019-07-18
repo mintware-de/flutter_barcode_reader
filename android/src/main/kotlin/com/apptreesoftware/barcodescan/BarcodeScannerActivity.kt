@@ -16,10 +16,11 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
-
+    var camera : Int  = 0
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         val TOGGLE_FLASH = 200
+        val CHANGE_CAMERA = 300
 
     }
 
@@ -28,6 +29,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         title = ""
         scannerView = ZXingScannerView(this)
         scannerView.setAutoFocus(true)
+        camera = intent.getIntExtra("CAMERA" , 0)
+
         // this paramter will make your HUAWEI phone works great!
         scannerView.setAspectTolerance(0.5f)
         setContentView(scannerView)
@@ -43,6 +46,10 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
                     TOGGLE_FLASH, 0, "Flash On")
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         }
+
+        val item = menu.add(0, CHANGE_CAMERA, 0, "Change Camera")
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -52,6 +59,13 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             this.invalidateOptionsMenu()
             return true
         }
+
+        if (item.itemId == CHANGE_CAMERA) {
+
+            this.invalidateOptionsMenu()
+            return true
+        }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -60,7 +74,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         scannerView.setResultHandler(this)
         // start camera immediately if permission is already given
         if (!requestCameraAccessIfNecessary()) {
-            scannerView.startCamera()
+            scannerView.startCamera(camera)
         }
     }
 
@@ -99,7 +113,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         when (requestCode) {
             REQUEST_TAKE_PHOTO_CAMERA_PERMISSION -> {
                 if (PermissionUtil.verifyPermissions(grantResults)) {
-                    scannerView.startCamera()
+                    scannerView.startCamera(camera)
                 } else {
                     finishWithError("PERMISSION_NOT_GRANTED")
                 }
