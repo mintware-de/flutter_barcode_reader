@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import android.view.Menu
 import android.view.MenuItem
 import com.google.zxing.Result
+import com.yourcompany.barcodescan.R
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 
@@ -36,11 +37,11 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         if (scannerView.flash) {
             val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "关灯")
+                    TOGGLE_FLASH, 0, getString(R.string.flash_off))
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         } else {
             val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "开灯")
+                    TOGGLE_FLASH, 0, getString(R.string.flash_on))
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         }
         return super.onCreateOptionsMenu(menu)
