@@ -57,6 +57,17 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             this.invalidateOptionsMenu()
         }
         var pasteBtn = findViewById<Button>(R.id.PASTE)
+        val bundle: Bundle? = intent.extras
+        bundle?.let {
+            bundle.apply {
+                //Intent with data
+                val pasteButtonText: String? = getString("pasteButtonText")
+                if (pasteButtonText != null) {
+                    pasteBtn.text = pasteButtonText
+                }
+
+            }
+        }
         val intent = Intent()
         val clip = clipboard?.primaryClip
         pasteText = clip?.getItemAt(0)
