@@ -5,65 +5,54 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import android.view.Menu
+import android.view.MenuItem
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
-import android.content.ClipboardManager
-import com.yourcompany.barcodescan.R
-import android.view.LayoutInflater
-import android.content.Context
-import android.graphics.drawable.Drawable
-import android.widget.Button
 
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
-    private var clipboard: ClipboardManager? = null
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
+        val TOGGLE_FLASH = 200
 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        setTheme(R.style.BarcodeScannerTheme)
         super.onCreate(savedInstanceState)
         title = ""
         scannerView = ZXingScannerView(this)
         scannerView.setAutoFocus(true)
+        // this paramter will make your HUAWEI phone works great!
         scannerView.setAspectTolerance(0.5f)
         setContentView(scannerView)
-        val inflator = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val v = inflator.inflate(com.yourcompany.barcodescan.R.layout.layout, null)
-        actionBar.customView = v
-        actionBar.setDisplayShowCustomEnabled(true)
-        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-        var flashBtn = findViewById<Button>(R.id.TOGGLE_FLASH)
-        flashBtn.setOnClickListener {
-            scannerView.flash = !scannerView.flash
-            if (!scannerView.flash) {
-                flashBtn.text = "FLASH ON"
-                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_on)
-                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null)
-            } else {
-                flashBtn.text = "FLASH OFF"
-                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_off)
-                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null)
-            }
-            this.invalidateOptionsMenu()
-        }
-        var pasteBtn = findViewById<Button>(R.id.PASTE)
-        pasteBtn.setOnClickListener {
-            val intent = Intent()
-            val clip = clipboard?.primaryClip
-            val pasteText = clip?.getItemAt(0)
-            intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
-            setResult(Activity.RESULT_OK, intent)
-            finish()
-        }
+    }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (scannerView.flash) {
+            val item = menu.add(0,
+                    TOGGLE_FLASH, 0, "Flash Off")
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        } else {
+            val item = menu.add(0,
+                    TOGGLE_FLASH, 0, "Flash On")
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == TOGGLE_FLASH) {
+            scannerView.flash = !scannerView.flash
+            this.invalidateOptionsMenu()
+            return true
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
