@@ -5,8 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 import android.content.ClipboardManager
@@ -48,11 +48,11 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             if (!scannerView.flash) {
                 flashBtn.text = "FLASH ON"
                 val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_on)
-                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null)
+                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null)
             } else {
                 flashBtn.text = "FLASH OFF"
                 val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_off)
-                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null,null,drawable,null)
+                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null)
             }
             this.invalidateOptionsMenu()
         }
@@ -79,6 +79,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         if (pasteText?.text == null) {
             pasteBtn.setVisibility(View.INVISIBLE)
         }
+
     }
 
     override fun onResume() {
@@ -120,7 +121,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     private fun requestCameraAccessIfNecessary(): Boolean {
         val array = arrayOf(Manifest.permission.CAMERA)
         if (ContextCompat
-                .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, array,
                     REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
@@ -129,7 +130,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         return false
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             REQUEST_TAKE_PHOTO_CAMERA_PERMISSION -> {
                 if (PermissionUtil.verifyPermissions(grantResults)) {

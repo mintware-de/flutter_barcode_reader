@@ -40,9 +40,22 @@
                              options:NSLayoutFormatAlignAllBottom
                              metrics:nil
                              views:@{@"scanRect": _scanRect}]];
+    
+  
+    CGSize viewSize = self.view.bounds.size;
+    self.cancelButton = [UIButton buttonWithType:UIButtonTypeRoundedRect | UIButtonTypeSystem];
+    [self.cancelButton.layer setBorderWidth:1.0f];
+    [self.cancelButton.layer setCornerRadius:10.0f];
+    [self.cancelButton.layer setBorderColor:self.view.tintColor.CGColor];
+    self.cancelButton.frame = CGRectMake((viewSize.width - 160) / 2, viewSize.height - 70, 160, 40);    
+    [self.cancelButton setTitle:@"Cancel" forState:UIControlStateNormal];    
+    [self.cancelButton setUserInteractionEnabled:true];
+    [self.cancelButton addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:self.cancelButton];
+    
   [_scanRect startAnimating];
     self.scanner = [[MTBBarcodeScanner alloc] initWithPreviewView:_previewView];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancel)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Paste Invoice" style:UIBarButtonItemStylePlain target:self action:@selector(paste)];
   [self updateFlashButton];
 }
 
@@ -82,7 +95,14 @@
 }
 
 - (void)cancel {
+    [self.delegate barcodeScannerViewController:self didFailWithErrorCode:@"USER_CANCELED"];
     [self dismissViewControllerAnimated:true completion:nil];
+}
+
+- (void)paste {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    [self.delegate barcodeScannerViewController:self didScanBarcodeWithResult:pasteboard.string];
+    [self dismissViewControllerAnimated:NO completion:nil];
 }
 
 - (void)updateFlashButton {

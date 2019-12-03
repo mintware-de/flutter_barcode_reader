@@ -34,7 +34,7 @@ For Android, you must do the following before you can use the plugin:
 Edit your project-level build.gradle file to look like this:
 
 	buildscript {
-	    ext.kotlin_version = '1.2.31'
+	    ext.kotlin_version = '1.3.21'
 	    ...
 	    dependencies {
 	        ...
@@ -48,7 +48,7 @@ Edit your app-level build.gradle file to look like this:
 	apply plugin: 'kotlin-android'
 	...
 	dependencies {
-	    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+	    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 	    ...
 	}
 
@@ -56,7 +56,7 @@ Now you can depend on the barcode_scan plugin in your pubspec.yaml file:
 
 	dependencies:
 	  ...
-	  barcode_scan: ^0.0.3
+	  barcode_scan: any
 
 Click "Packages get" in Android Studio or run `flutter packages get` in your project folder.
 
