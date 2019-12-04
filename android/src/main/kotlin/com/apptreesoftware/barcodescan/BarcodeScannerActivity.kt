@@ -7,52 +7,79 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import android.view.Menu
-import android.view.MenuItem
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
-
+import android.content.ClipboardManager
+import com.yourcompany.barcodescan.R
+import android.view.LayoutInflater
+import android.content.Context
+import android.graphics.drawable.Drawable
+import android.widget.Button
+import android.view.View
+import android.content.ClipData
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
+    private var clipboard: ClipboardManager? = null
+    private var pasteText: ClipData.Item? = null
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
-        val TOGGLE_FLASH = 200
 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.BarcodeScannerTheme)
         super.onCreate(savedInstanceState)
         title = ""
         scannerView = ZXingScannerView(this)
         scannerView.setAutoFocus(true)
-        // this paramter will make your HUAWEI phone works great!
         scannerView.setAspectTolerance(0.5f)
         setContentView(scannerView)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (scannerView.flash) {
-            val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "Flash Off")
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        } else {
-            val item = menu.add(0,
-                    TOGGLE_FLASH, 0, "Flash On")
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        }
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == TOGGLE_FLASH) {
+        val inflator = this.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val v = inflator.inflate(com.yourcompany.barcodescan.R.layout.layout, null)
+        actionBar.customView = v
+        actionBar.setDisplayShowCustomEnabled(true)
+        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        var flashBtn = findViewById<Button>(R.id.TOGGLE_FLASH)
+        flashBtn.setOnClickListener {
             scannerView.flash = !scannerView.flash
+            if (!scannerView.flash) {
+                flashBtn.text = "FLASH ON"
+                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_on)
+                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null)
+            } else {
+                flashBtn.text = "FLASH OFF"
+                val drawable = ContextCompat.getDrawable(this, R.drawable.ic_flash_off)
+                flashBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, drawable, null)
+            }
             this.invalidateOptionsMenu()
-            return true
         }
-        return super.onOptionsItemSelected(item)
+        var pasteBtn = findViewById<Button>(R.id.PASTE)
+        val bundle: Bundle? = intent.extras
+        bundle?.let {
+            bundle.apply {
+                //Intent with data
+                val pasteButtonText: String? = getString("pasteButtonText")
+                if (pasteButtonText != null) {
+                    pasteBtn.text = pasteButtonText
+                }
+
+            }
+        }
+        val intent = Intent()
+        val clip = clipboard?.primaryClip
+        pasteText = clip?.getItemAt(0)
+        pasteBtn.setOnClickListener {
+            intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
+            setResult(Activity.RESULT_OK, intent)
+            finish()
+        }
+        if (pasteText?.text == null) {
+            pasteBtn.setVisibility(View.INVISIBLE)
+        }
+
     }
 
     override fun onResume() {
@@ -61,6 +88,14 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         // start camera immediately if permission is already given
         if (!requestCameraAccessIfNecessary()) {
             scannerView.startCamera()
+        }
+        // show Paste Invoice button if there's a valid item in clipboard
+        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+        val clip = clipboard?.primaryClip
+        pasteText = clip?.getItemAt(0)
+        if (pasteText?.text != null) {
+            var pasteBtn = findViewById<Button>(R.id.PASTE)
+            pasteBtn.setVisibility(View.VISIBLE)
         }
     }
 
@@ -86,7 +121,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     private fun requestCameraAccessIfNecessary(): Boolean {
         val array = arrayOf(Manifest.permission.CAMERA)
         if (ContextCompat
-                .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, array,
                     REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
@@ -95,7 +130,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         return false
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             REQUEST_TAKE_PHOTO_CAMERA_PERMISSION -> {
                 if (PermissionUtil.verifyPermissions(grantResults)) {
