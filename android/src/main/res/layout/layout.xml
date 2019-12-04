@@ -13,7 +13,7 @@
         android:drawableLeft="@drawable/ic_paste"
         android:drawableStart="@drawable/ic_paste"
         android:drawablePadding="8dp"
-        android:text="PASTE INVOICE"
+        android:text="PASTE"
         android:textColor="@android:color/white"
         android:scaleType="centerInside" />
 
