@@ -84,11 +84,11 @@
         if (code) {
             NSString *value = code.stringValue;
             
-            if (code.type == AVMetadataObjectTypeEAN13Code && [value hasPrefix:@"0"] && value.length == 13) {
+            if ([code.type isEqualToString:AVMetadataObjectTypeEAN13Code] && [value hasPrefix:@"0"] && value.length == 13) {
                 value = [value substringFromIndex:1];
             }
             
-            [self.delegate barcodeScannerViewController:self didScanBarcodeWithResult:code.stringValue];
+            [self.delegate barcodeScannerViewController:self didScanBarcodeWithResult:value];
             [self dismissViewControllerAnimated:NO completion:nil];
         }
     } error:&error];
