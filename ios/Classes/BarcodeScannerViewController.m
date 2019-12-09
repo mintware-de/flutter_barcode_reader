@@ -82,6 +82,12 @@
         [self.scanner stopScanning];
          AVMetadataMachineReadableCodeObject *code = codes.firstObject;
         if (code) {
+            NSString *value = code.stringValue;
+            
+            if (code.type == AVMetadataObjectTypeEAN13Code && [value hasPrefix:@"0"] && value.length == 13) {
+                value = [value substringFromIndex:1];
+            }
+            
             [self.delegate barcodeScannerViewController:self didScanBarcodeWithResult:code.stringValue];
             [self dismissViewControllerAnimated:NO completion:nil];
         }
