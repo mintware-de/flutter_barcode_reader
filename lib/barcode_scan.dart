@@ -7,5 +7,5 @@ class BarcodeScanner {
   static const UserCanceled = 'USER_CANCELED';
   static const MethodChannel _channel =
       const MethodChannel('com.apptreesoftware.barcode_scan');
-  static Future<String> scan() async => await _channel.invokeMethod('scan');
+  static Future<String> scan({bool flash = false}) async => await _channel.invokeMethod('scan', <String, dynamic>{'flash': flash});
 }
