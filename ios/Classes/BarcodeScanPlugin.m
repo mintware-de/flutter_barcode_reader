@@ -23,6 +23,8 @@
     BarcodeScannerViewController *scannerViewController = [[BarcodeScannerViewController alloc] init];
     UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:scannerViewController];
     scannerViewController.delegate = self;
+    scannerViewController.modalPresentationStyle = UIModalPresentationFullScreen;
+    navigationController.modalPresentationStyle = UIModalPresentationFullScreen;
     [self.hostViewController presentViewController:navigationController animated:NO completion:nil];
 }
 
