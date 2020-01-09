@@ -7,5 +7,5 @@ class BarcodeScanner {
   static const UserCanceled = 'USER_CANCELED';
   static const MethodChannel _channel =
       const MethodChannel('com.apptreesoftware.barcode_scan');
-  static Future<String> scan({String pasteButtonText}) async => await _channel.invokeMethod('scan', {'pasteButtonText': pasteButtonText});
+  static Future<String> scan({String pasteText, String pasteButtonText}) async => await _channel.invokeMethod('scan', {'pasteText': pasteText, 'pasteButtonText': pasteButtonText});
 }

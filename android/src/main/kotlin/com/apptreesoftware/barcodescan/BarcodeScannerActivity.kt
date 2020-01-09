@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Build
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.zxing.Result
@@ -22,7 +23,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: me.dm7.barcodescanner.zxing.ZXingScannerView
     private var clipboard: ClipboardManager? = null
-    private var pasteText: ClipData.Item? = null
+    private var pasteText: String? = null
 
     companion object {
         val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
@@ -41,7 +42,6 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         val v = inflator.inflate(com.yourcompany.barcodescan.R.layout.layout, null)
         actionBar.customView = v
         actionBar.setDisplayShowCustomEnabled(true)
-        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
         var flashBtn = findViewById<Button>(R.id.TOGGLE_FLASH)
         flashBtn.setOnClickListener {
             scannerView.flash = !scannerView.flash
@@ -68,15 +68,26 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
             }
         }
+        if (Build.VERSION.SDK_INT >= 29) {
+            val bundle: Bundle? = intent.extras
+            bundle?.let {
+                bundle.apply {
+                    //Intent with data
+                    pasteText = getString("pasteText")
+                }
+            }
+        } else {
+            clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+            val clip = clipboard?.primaryClip
+            pasteText = clip?.getItemAt(0)?.text.toString()
+        }
         val intent = Intent()
-        val clip = clipboard?.primaryClip
-        pasteText = clip?.getItemAt(0)
         pasteBtn.setOnClickListener {
-            intent.putExtra("SCAN_RESULT", pasteText?.text.toString())
+            intent.putExtra("SCAN_RESULT", pasteText)
             setResult(Activity.RESULT_OK, intent)
             finish()
         }
-        if (pasteText?.text == null) {
+        if (pasteText == null) {
             pasteBtn.setVisibility(View.INVISIBLE)
         }
 
@@ -89,13 +100,15 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         if (!requestCameraAccessIfNecessary()) {
             scannerView.startCamera()
         }
-        // show Paste Invoice button if there's a valid item in clipboard
-        clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
-        val clip = clipboard?.primaryClip
-        pasteText = clip?.getItemAt(0)
-        if (pasteText?.text != null) {
-            var pasteBtn = findViewById<Button>(R.id.PASTE)
-            pasteBtn.setVisibility(View.VISIBLE)
+        if (Build.VERSION.SDK_INT < 29) {
+            // show Paste Invoice button if there's a valid item in clipboard
+            clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager?
+            val clip = clipboard?.primaryClip
+            pasteText = clip?.getItemAt(0)?.text.toString()
+            if (pasteText != null) {
+                var pasteBtn = findViewById<Button>(R.id.PASTE)
+                pasteBtn.setVisibility(View.VISIBLE)
+            }
         }
     }
 

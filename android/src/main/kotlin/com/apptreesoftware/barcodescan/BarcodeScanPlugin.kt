@@ -27,15 +27,17 @@ class BarcodeScanPlugin(val activity: Activity): MethodCallHandler,
   override fun onMethodCall(call: MethodCall, result: Result): Unit {
     if (call.method.equals("scan")) {
       this.result = result
+      var pasteText: String? = call.argument("pasteText")
       var pasteButtonText: String? = call.argument("pasteButtonText")
-      showBarcodeView(pasteButtonText)
+      showBarcodeView(pasteText, pasteButtonText)
     } else {
       result.notImplemented()
     }
   }
 
-  private fun showBarcodeView(pasteButtonText: String?) {
+  private fun showBarcodeView(pasteText: String?, pasteButtonText: String?) {
     val intent = Intent(activity, BarcodeScannerActivity::class.java)
+    intent.putExtra("pasteText", pasteText)
     intent.putExtra("pasteButtonText", pasteButtonText)
     activity.startActivityForResult(intent, 100)
   }
