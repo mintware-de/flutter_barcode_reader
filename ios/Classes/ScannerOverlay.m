@@ -83,13 +83,25 @@
   }
   
   - (CGRect)scanRect {
-    CGRect rect = self.frame;
-    CGFloat heightMultiplier = 3.0/4.0; // 4:3 aspect ratio
-    CGFloat scanRectWidth = rect.size.width * 0.8f;
-    CGFloat scanRectHeight = scanRectWidth * heightMultiplier;
-    CGFloat scanRectOriginX = (rect.size.width / 2) - (scanRectWidth / 2);
-    CGFloat scanRectOriginY = (rect.size.height / 2) - (scanRectHeight / 2);
-    return CGRectMake(scanRectOriginX, scanRectOriginY, scanRectWidth, scanRectHeight);
+      CGRect rect = self.frame;
+
+      CGFloat frameWidth = rect.size.width;
+      CGFloat frameHeight = rect.size.height;
+
+      BOOL isLandscape = frameWidth > frameHeight;
+      CGFloat widthOnPotrait = isLandscape ? frameHeight : frameWidth;
+      CGFloat heightMultiplier = 3.0/4.0; // 4:3 aspect ratio
+      CGFloat scanRectWidth = widthOnPotrait * 0.8f;
+      CGFloat scanRectHeight = scanRectWidth * heightMultiplier;
+
+      if(isLandscape) {
+          CGFloat navbarHeight = 32;
+          frameHeight += navbarHeight;
+      }
+
+      CGFloat scanRectOriginX = (frameWidth - scanRectWidth) / 2;
+      CGFloat scanRectOriginY = (frameHeight - scanRectHeight) / 2;
+      return CGRectMake(scanRectOriginX, scanRectOriginY, scanRectWidth, scanRectHeight);
   }
   
   - (CGRect)scanLineRect {

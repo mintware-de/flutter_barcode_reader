@@ -16,6 +16,7 @@
     CGRect reversedBounds = CGRectMake(bounds.origin.x, bounds.origin.y, bounds.size.height, bounds.size.width);
     self.previewView.bounds = reversedBounds;
     self.previewView.frame = reversedBounds;
+    [self.scanRect stopAnimating];
     [self.scanRect removeFromSuperview];
     [self setupScanRect:reversedBounds];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
