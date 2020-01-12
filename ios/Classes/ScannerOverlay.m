@@ -89,10 +89,10 @@
       CGFloat frameHeight = rect.size.height;
 
       BOOL isLandscape = frameWidth > frameHeight;
-      CGFloat widthOnPotrait = isLandscape ? frameHeight : frameWidth;
-      CGFloat heightMultiplier = 3.0/4.0; // 4:3 aspect ratio
-      CGFloat scanRectWidth = widthOnPotrait * 0.8f;
-      CGFloat scanRectHeight = scanRectWidth * heightMultiplier;
+      CGFloat widthOnPortrait = isLandscape ? frameHeight : frameWidth;
+      CGFloat scanRectWidth = widthOnPortrait * 0.8f;
+      CGFloat aspectRatio = 3.0/4.0;
+      CGFloat scanRectHeight = scanRectWidth * aspectRatio;
 
       if(isLandscape) {
           CGFloat navbarHeight = 32;
@@ -106,8 +106,8 @@
   
   - (CGRect)scanLineRect {
     CGRect scanRect = [self scanRect];
-    CGRect rect = self.frame;
-    return CGRectMake(scanRect.origin.x, rect.size.height / 2, scanRect.size.width, 1);
+    CGFloat positionY = scanRect.origin.y + (scanRect.size.height / 2);
+    return CGRectMake(scanRect.origin.x, positionY, scanRect.size.width, 1);
   }
 
 @end
