@@ -8,3 +8,8 @@ ios/.generated/
 packages
 pubspec.lock
 .flutter-plugins
+.flutter-plugins-dependencies
+ios/Flutter.podspec
+ios/Flutter/Flutter.podspec
+ios/Flutter/flutter_export_environment.sh
+ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist

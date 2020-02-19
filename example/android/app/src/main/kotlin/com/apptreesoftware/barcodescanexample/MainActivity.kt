@@ -1,4 +1,4 @@
-package com.apptreesoftware.barcodescanexample
+package de.mintware.barcode_scan_example
 
 import android.os.Bundle
 

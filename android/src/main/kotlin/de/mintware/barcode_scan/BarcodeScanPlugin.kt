@@ -1,4 +1,4 @@
-package com.apptreesoftware.barcodescan
+package de.mintware.barcode_scan
 
 import android.app.Activity
 import android.content.Intent
@@ -16,7 +16,7 @@ class BarcodeScanPlugin(private val registrar: Registrar) : MethodCallHandler, P
     companion object {
         @JvmStatic
         fun registerWith(registrar: Registrar) {
-            val channel = MethodChannel(registrar.messenger(), "com.apptreesoftware.barcode_scan")
+            val channel = MethodChannel(registrar.messenger(), "de.mintware.barcode_scan")
             val plugin = BarcodeScanPlugin(registrar)
             channel.setMethodCallHandler(plugin)
             registrar.addActivityResultListener(plugin)

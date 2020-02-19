@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.yourcompany.barcodescan">
+  package="de.mintware.barcodescan">
 
   <uses-permission android:name="android.permission.CAMERA" />
 
   <application>
-    <activity android:name="com.apptreesoftware.barcodescan.BarcodeScannerActivity" />
+    <activity android:name="de.mintware.barcode_scan.BarcodeScannerActivity" />
   </application>
 </manifest>
