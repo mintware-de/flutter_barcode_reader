@@ -1,3 +1,23 @@
+## Next
+
+Features:
+- [Add-to-app support](https://github.com/mintware-de/flutter_barcode_reader/pull/168) - @santiihoyos
+
+Bugfixes:
+- [Fixed rotation on iOS](https://github.com/mintware-de/flutter_barcode_reader/pull/167) - @mintware-de
+  - [#61 Rotating orientation on iPhones only shows half the screen](https://github.com/mintware-de/flutter_barcode_reader/issues/61)
+
+Changes:
+- [Fix compile warning](https://github.com/apptreesoftware/flutter_barcode_reader/pull/127) - @lookfirst
+- [Upgrade gradle](https://github.com/mintware-de/flutter_barcode_reader/pull/142) - @SuuSoJeat
+  - `com.android.tools.build:gradle`: 3.3.1 -> 3.5.0
+  - `org.jetbrains.kotlin:kotlin-gradle-plugin`: 1.3.20 -> 1.3.50
+  - `compileSdkVersion`: 28 -> 29
+  - `targetSdkVersion`: 28 -> 29
+  - `gradle`: 4.10.2 -> 5.4.1
+- [Package description updated](https://github.com/mintware-de/flutter_barcode_reader/pull/180) - @connectety
+
+
 ## [1.0.0] - 8/30/18
 
 Breaking Change: Adds support for AndroidX
