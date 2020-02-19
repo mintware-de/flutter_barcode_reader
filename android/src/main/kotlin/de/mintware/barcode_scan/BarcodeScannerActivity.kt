@@ -1,4 +1,4 @@
-package com.apptreesoftware.barcodescan
+package de.mintware.barcode_scan
 
 import android.Manifest
 import android.app.Activity
