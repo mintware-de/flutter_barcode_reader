@@ -1,4 +1,4 @@
-## Next
+## v2.0.0 - 2020-02-19
 
 Features:
 - [Add-to-app support](https://github.com/mintware-de/flutter_barcode_reader/pull/168) - @santiihoyos
