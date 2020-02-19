@@ -1,10 +1,3 @@
-# This plugin is no longer maintained
-
-I no longer have time to maintain this plugin. In addition, other libraries have come along that I consider a better replacement, most notably the [MLKit based barcode detection plugin](https://pub.dev/packages/flutter_camera_ml_vision). 
-
-If someone is interested in taking over this plugin and maintaining it please contact me and I will transfer ownership.
-
-
 # Barcode Scanner
 
 A flutter plugin for scanning 2D barcodes and QR codes. 
