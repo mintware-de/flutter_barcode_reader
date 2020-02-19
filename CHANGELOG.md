@@ -1,3 +1,8 @@
+## v2.0.1 - 2020-02-19
+
+Bugfixes:
+- Fixed wrong build.gradle
+
 ## v2.0.0 - 2020-02-19
 
 Features:
