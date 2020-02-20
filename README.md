@@ -74,3 +74,9 @@ To use on iOS, you must add the the camera usage description to your Info.plist
     <!-- ... -->
 </dict>
 ```
+
+
+## Common problems
+### Android "Could not find org.jetbrains.kotlin:kotlin-stdlib-jre..."
+Change `org.jetbrains.kotlin:kotlin-stdlib-jre` to `org.jetbrains.kotlin:kotlin-stdlib-jdk`
+([StackOverflow](https://stackoverflow.com/a/53358817))
