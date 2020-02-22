@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_package = "de.mintware.barcode_scan";
+
+message Configuration {
+    // Strings
+    string cancelText = 1;
+    string flashOnText = 2;
+    string flashOffText = 3;
+
+    // Restricts the barcode format which should be read
+    repeated BarcodeFormat restrictFormat = 4;
+
+    // Index of the camera which should used. -1 uses the default camera
+    int32 useCamera = 5;
+}
+
+enum BarcodeFormat {
+    aztec = 0;
+    code39 = 1;
+    code93 = 2;
+    ean8 = 3;
+    ean13 = 4;
+    code128 = 5;
+    dataMatrix = 6;
+    qr = 7;
+    interleaved2of5 = 8;
+    upce = 9;
+    pdf417 = 10;
+}

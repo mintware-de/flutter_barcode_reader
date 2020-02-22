@@ -9,24 +9,35 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
-    private lateinit var scannerView: ZXingScannerView
+    private lateinit var scannerView: ZXingAutofocusScannerView
+    private lateinit var config: Protos.Configuration
 
     companion object {
         const val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         const val TOGGLE_FLASH = 200
+        const val EXTRA_CONFIG = "config"
     }
 
     // region Activity lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        config = Protos.Configuration.parseFrom(intent.extras!!.getByteArray(EXTRA_CONFIG))
+
         title = ""
-        scannerView = ZXingScannerView(this)
+        scannerView = ZXingAutofocusScannerView(this)
         scannerView.setAutoFocus(true)
+
+        val restrictedFormats = mapRestrictedBarcodeTypes()
+        if (restrictedFormats.isNotEmpty()) {
+            scannerView.setFormats(restrictedFormats)
+        }
 
         // this parameter will make your HUAWEI phone works great!
         scannerView.setAspectTolerance(0.5f)
@@ -44,14 +55,14 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
         // start camera immediately if permission is already given
         if (!requestCameraAccessIfNecessary()) {
-            scannerView.startCamera()
+            startCamera()
         }
     }
     // endregion
 
     // region AppBar menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val buttonText = if (scannerView.flash) "Flash Off" else "Flash On"
+        val buttonText = if (scannerView.flash) config.flashOffText else config.flashOnText
         val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
 
@@ -94,13 +105,21 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == REQUEST_TAKE_PHOTO_CAMERA_PERMISSION) {
             if (verifyPermissions(grantResults)) {
-                scannerView.startCamera()
+                startCamera()
             } else {
                 finishWithError("PERMISSION_NOT_GRANTED")
             }
             return
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    private fun startCamera() {
+        if (config.useCamera > -1) {
+            scannerView.startCamera(config.useCamera)
+        } else {
+            scannerView.startCamera()
+        }
     }
 
     /**
@@ -114,6 +133,29 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         return grantResults.isNotEmpty() && grantResults.all {
             it == PackageManager.PERMISSION_GRANTED
         }
+    }
+
+    private fun mapRestrictedBarcodeTypes(): List<BarcodeFormat> {
+        val types: MutableList<BarcodeFormat> = mutableListOf()
+
+        this.config.restrictFormatList.filterNotNull().forEach {
+            when (it) {
+                Protos.BarcodeFormat.aztec -> types.add(BarcodeFormat.AZTEC)
+                Protos.BarcodeFormat.code39 -> types.add(BarcodeFormat.CODE_39)
+                Protos.BarcodeFormat.code93 -> types.add(BarcodeFormat.CODE_93)
+                Protos.BarcodeFormat.code128 -> types.add(BarcodeFormat.CODE_128)
+                Protos.BarcodeFormat.dataMatrix -> types.add(BarcodeFormat.DATA_MATRIX)
+                Protos.BarcodeFormat.ean8 -> types.add(BarcodeFormat.EAN_8)
+                Protos.BarcodeFormat.ean13 -> types.add(BarcodeFormat.EAN_13)
+                Protos.BarcodeFormat.interleaved2of5 -> types.add(BarcodeFormat.ITF)
+                Protos.BarcodeFormat.pdf417 -> types.add(BarcodeFormat.PDF_417)
+                Protos.BarcodeFormat.qr -> types.add(BarcodeFormat.QR_CODE)
+                Protos.BarcodeFormat.upce -> types.add(BarcodeFormat.UPC_E)
+                Protos.BarcodeFormat.UNRECOGNIZED -> print("Unrecognized")
+            }
+        }
+
+        return types
     }
 }
 

@@ -75,6 +75,29 @@ To use on iOS, you must add the the camera usage description to your Info.plist
 </dict>
 ```
 
+## Development setup
+
+###  Setup protobuf
+
+Mac:
+```bash
+$ brew install protobuf
+$ brew install swift-protobuf
+```
+Windows / Linux: https://github.com/protocolbuffers/protobuf#protocol-compiler-installation
+
+
+Activate the protobuf dart plugin:
+`$ pub global activate protoc_plugin`
+
+Install the`Protobuf Support` plugin for IDEA / Android Studio or `vscode-proto3` for VS Code
+
+If you changed the protos.proto you've to execute the ./generate_proto.sh to update the dart / swift sources
+
+
+
+
+
 
 ## Common problems
 ### Android "Could not find org.jetbrains.kotlin:kotlin-stdlib-jre..."

@@ -1,5 +1,7 @@
 import Flutter
 import UIKit
+import SwiftProtobuf
+import AVFoundation
 
 public class SwiftBarcodeScanPlugin: NSObject, FlutterPlugin, BarcodeScannerViewControllerDelegate {
     
@@ -14,15 +16,18 @@ public class SwiftBarcodeScanPlugin: NSObject, FlutterPlugin, BarcodeScannerView
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        self.result = result
         if ("scan" == call.method) {
-            self.result = result
-            showBarcodeView()
+            let configuration: Configuration? = getPayload(call: call)
+            showBarcodeView(config: configuration)}
+        else if ("numberOfCameras" == call.method) {
+            result(AVCaptureDevice.devices(for: .video).count)
         } else {
             result(FlutterMethodNotImplemented)
         }
     }
     
-    private func showBarcodeView() {
+    private func showBarcodeView(config: Configuration? = nil) {
         let scannerViewController = BarcodeScannerViewController()
         
         let navigationController = UINavigationController(rootViewController: scannerViewController)
@@ -31,8 +36,24 @@ public class SwiftBarcodeScanPlugin: NSObject, FlutterPlugin, BarcodeScannerView
             navigationController.modalPresentationStyle = .fullScreen
         }
         
+        if let config = config {
+            scannerViewController.config = config
+        }
         scannerViewController.delegate = self
         hostViewController?.present(navigationController, animated: false)
+    }
+    
+    private func getPayload<T : SwiftProtobuf.Message>(call: FlutterMethodCall) -> T? {
+        
+        if(call.arguments == nil || !(call.arguments is FlutterStandardTypedData)) {
+            return nil
+        }
+        do {
+            let configuration = try T(serializedData: (call.arguments as! FlutterStandardTypedData).data)
+            return configuration
+        } catch {
+        }
+        return nil
     }
     
     func didScanBarcodeWithResult(_ controller: BarcodeScannerViewController?, barcode: String) {

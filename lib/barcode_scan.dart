@@ -1,6 +1,9 @@
 import 'dart:async';
 
+import 'package:barcode_scan/gen/protos/protos.pb.dart';
 import 'package:flutter/services.dart';
+
+export 'package:barcode_scan/gen/protos/protos.pb.dart';
 
 /// Barcode scanner plugin
 /// Simply call `var barcode = await BarcodeScanner.scan()` to scan a barcode
@@ -19,5 +22,11 @@ class BarcodeScanner {
   /// returns the barcode if one was scanned.
   /// Can throw an exception.
   /// See also [CameraAccessDenied] and [UserCanceled]
-  static Future<String> scan() async => await _channel.invokeMethod('scan');
+  static Future<String> scan({Configuration config}) async =>
+      await _channel.invokeMethod('scan', config?.writeToBuffer());
+
+  /// Returns the number of cameras which are available
+  /// Use n-1 as the index of the camera which should be used.
+  static Future<int> get numberOfCameras =>
+      _channel.invokeMethod('numberOfCameras');
 }

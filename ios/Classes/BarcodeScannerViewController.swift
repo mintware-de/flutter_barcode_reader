@@ -12,6 +12,13 @@ class BarcodeScannerViewController: UIViewController {
     private var previewView: UIView?
     private var scanRect: ScannerOverlay?
     private var scanner: MTBBarcodeScanner?
+    
+    var config: Configuration = Configuration.with {
+        $0.cancelText = "Cancel"
+        $0.flashOnText = "Flash On"
+        $0.flashOffText = "Flash Off"
+        $0.useCamera = -1 // Default camera
+    }
     var delegate: BarcodeScannerViewControllerDelegate?
     
     private var device: AVCaptureDevice? {
@@ -39,10 +46,19 @@ class BarcodeScannerViewController: UIViewController {
             view.addSubview(previewView)
         }
         setupScanRect(view.bounds)
-        scanner = MTBBarcodeScanner(previewView: previewView)
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel,
-                                                           target: self,
-                                                           action: #selector(cancel)
+        
+        let restrictedBarcodeTypes = mapRestrictedBarcodeTypes();
+        if restrictedBarcodeTypes.isEmpty {
+            scanner = MTBBarcodeScanner(previewView: previewView)
+        } else {
+            scanner = MTBBarcodeScanner(metadataObjectTypes: restrictedBarcodeTypes,
+                                        previewView: previewView
+            )
+        }
+        navigationItem.leftBarButtonItem =  UIBarButtonItem(title: config.cancelText,
+                                                                   style: .plain,
+                                                                   target: self,
+                                                                   action: #selector(cancel)
         )
         updateToggleFlashButton()
     }
@@ -99,7 +115,7 @@ class BarcodeScannerViewController: UIViewController {
     
     private func startScan() {
         do {
-            try scanner!.startScanning(resultBlock: { codes in
+            try scanner!.startScanning(with: cameraFromConfig, resultBlock: { codes in
                 if let code = codes?.first {
                     self.scanner!.stopScanning()
                     self.delegate?.didScanBarcodeWithResult(self, barcode: code.stringValue ?? "")
@@ -125,7 +141,7 @@ class BarcodeScannerViewController: UIViewController {
             return
         }
         
-        let buttonText = isFlashOn ? "Flash Off" : "Flash On"
+        let buttonText = isFlashOn ? config.flashOffText : config.flashOnText
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: buttonText,
                                                             style: .plain,
                                                             target: self,
@@ -155,5 +171,55 @@ class BarcodeScannerViewController: UIViewController {
     private func errorResult(errorCode: String){
         delegate?.didFailWithErrorCode(self, errorCode: errorCode)
         dismiss(animated: false)
+    }
+    
+    private func mapRestrictedBarcodeTypes() -> [String] {
+        var types: [AVMetadataObject.ObjectType] = [];
+        
+        config.restrictFormat.forEach({ format in
+            switch(format) {
+            case .aztec:
+                types.append(.aztec)
+                break
+            case .code39:
+                types.append(.code39)
+                break
+            case .code93:
+                types.append(.code93)
+                break
+            case .code128:
+                types.append(.code128)
+                break
+            case .dataMatrix:
+                types.append(.dataMatrix)
+                break
+            case .ean8:
+                types.append(.ean8)
+                break
+            case .ean13:
+                types.append(.ean13)
+                break
+            case .interleaved2Of5:
+                types.append(.interleaved2of5)
+                break
+            case .pdf417:
+                types.append(.pdf417)
+                break
+            case .qr:
+                types.append(.qr)
+                break
+            case .upce:
+                types.append(.upce)
+                break
+            default:
+                break
+            }
+        });
+        
+        return types.map({ t in t.rawValue});
+    }
+    
+    private var cameraFromConfig: MTBCamera {
+        return config.useCamera == 1 ? .front : .back;
     }
 }

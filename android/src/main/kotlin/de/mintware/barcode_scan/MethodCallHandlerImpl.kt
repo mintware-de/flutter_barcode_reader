@@ -1,5 +1,6 @@
 package de.mintware.barcode_scan
 
+import android.hardware.Camera
 import androidx.annotation.Nullable
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -14,7 +15,23 @@ class MethodCallHandlerImpl(private val activityHelper: ActivityHelper
 
     @Suppress("unused")
     fun scan(call: MethodCall, result: MethodChannel.Result) {
-        activityHelper.showScannerActivity(result)
+        var config: Protos.Configuration = Protos.Configuration.newBuilder()
+                .setCancelText("Cancel")
+                .setFlashOnText("Flash On")
+                .setFlashOffText("Flash Off")
+                .addAllRestrictFormat(mutableListOf())
+                .setUseCamera(-1)
+                .build()
+
+        if (call.arguments is ByteArray) {
+            config = Protos.Configuration.parseFrom(call.arguments as ByteArray)
+        }
+        activityHelper.showScannerActivity(result, config)
+    }
+
+    @Suppress("unused")
+    fun numberOfCameras(call: MethodCall, result: MethodChannel.Result) {
+        result.success(Camera.getNumberOfCameras())
     }
 
     fun startListening(messenger: BinaryMessenger?) {

@@ -18,7 +18,7 @@ class ActivityHelper(private var applicationContext: Context?,
 
     private val resultMap: HashMap<Int, (requestCode: Int, resultCode: Int, data: Intent?) -> Boolean> = linkedMapOf()
 
-    fun showScannerActivity(result: MethodChannel.Result) {
+    fun showScannerActivity(result: MethodChannel.Result, config: Protos.Configuration) {
         if (activity == null) {
             Log.d(TAG, "Could not launch BarcodeScannerActivity because the plugin is not attached to any activity")
             return
@@ -40,6 +40,7 @@ class ActivityHelper(private var applicationContext: Context?,
         }
 
         val intent = Intent(applicationContext, BarcodeScannerActivity::class.java)
+        intent.putExtra(BarcodeScannerActivity.EXTRA_CONFIG, config.toByteArray())
         activity!!.startActivityForResult(intent, REQ_START_SCAN)
     }
 

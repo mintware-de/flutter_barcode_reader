@@ -2,6 +2,13 @@
 
 - iOS code migrated to Swift
 - Android code migrated to FlutterPlugin
+- Platform communication with protobuf
+- Retrieve the number of available cameras with `BarcodeScanner.numberOfCameras`
+
+Flexible configuration:
+- Set the strings for the flash on/off and the cancel button
+- Restrict the detected barcode formats
+- Set which camera is used for scanning barcodes
 
 **BREAKING CHANGES**:
 - minSdk version on Android is now 18
