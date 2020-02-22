@@ -1,3 +1,11 @@
+## Next release
+
+- iOS code migrated to Swift
+- Android code migrated to FlutterPlugin
+
+**BREAKING CHANGES**:
+- minSdk version on Android is now 18
+
 ## v2.0.1 - 2020-02-19
 
 Bugfixes:
