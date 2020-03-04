@@ -1,48 +1,45 @@
 package de.mintware.barcode_scan
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
-    private var scannerView: ZXingScannerView? = null
-    private var scannerViewInitialized: Boolean = false
+    lateinit var scannerView: ZXingScannerView
 
     companion object {
-        val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
-        val TOGGLE_FLASH = 200
+        const val REQUEST_CAMERA_PERMISSION = 100
+        const val TOGGLE_FLASH = 200
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = ""
+        scannerView = ZXingScannerView(this)
+        scannerView.setAutoFocus(true)
+        // this paramter will make your HUAWEI phone works great!
+        scannerView.setAspectTolerance(0.5f)
+        setContentView(scannerView)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        scannerView?.also {
-            val buttonText = if (it.flash) "Flash Off" else "Flash On"
-            val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        }
+        val buttonText = if (it.flash) "Flash Off" else "Flash On"
+        val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == TOGGLE_FLASH) {
-            scannerView?.also {
-                it.toggleFlash()
-                this.invalidateOptionsMenu()
-            }
+            scannerView.flash = !scannerView.flash
+            this.invalidateOptionsMenu()
             return true
         }
         return super.onOptionsItemSelected(item)
@@ -50,96 +47,26 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     override fun onResume() {
         super.onResume()
-
-        if (!requestCameraAccessIfNecessary()) {
-            setupScannerView()
-            scannerView?.setResultHandler(this)
-            scannerView?.startCamera()
-        }
-    }
-
-    private fun setupScannerView() {
-        if (scannerViewInitialized || requestCameraAccessIfNecessary()) {
-            return
-        }
-
-        scannerView = ZXingScannerView(this).apply {
-            setAutoFocus(true)
-            // this paramter will make your HUAWEI phone works great!
-            setAspectTolerance(0.5f)
-        }
-        setContentView(scannerView)
-
-        scannerViewInitialized = true
+        scannerView.setResultHandler(this)
+        scannerView.startCamera()
     }
 
     override fun onPause() {
         super.onPause()
-        scannerView?.stopCamera()
+        scannerView.stopCamera()
     }
 
     override fun handleResult(result: Result?) {
         val intent = Intent()
         intent.putExtra("SCAN_RESULT", result.toString())
-        setResult(RESULT_OK, intent)
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
     fun finishWithError(errorCode: String) {
         val intent = Intent()
         intent.putExtra("ERROR_CODE", errorCode)
-        setResult(RESULT_CANCELED, intent)
+        setResult(Activity.RESULT_CANCELED, intent)
         finish()
-    }
-
-    private fun requestCameraAccessIfNecessary(): Boolean {
-        val array = arrayOf(Manifest.permission.CAMERA)
-        if (ContextCompat
-                .checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, array,
-                    REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
-            return true
-        }
-        return false
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,grantResults: IntArray) {
-        when (requestCode) {
-            REQUEST_TAKE_PHOTO_CAMERA_PERMISSION -> {
-                if (PermissionUtil.verifyPermissions(grantResults)) {
-                    scannerView?.startCamera()
-                } else {
-                    finishWithError("PERMISSION_NOT_GRANTED")
-                }
-            }
-            else -> {
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            }
-        }
-    }
-}
-
-object PermissionUtil {
-
-    /**
-     * Check that all given permissions have been granted by verifying that each entry in the
-     * given array is of the value [PackageManager.PERMISSION_GRANTED].
-
-     * @see Activity.onRequestPermissionsResult
-     */
-    fun verifyPermissions(grantResults: IntArray): Boolean {
-        // At least one result must be checked.
-        if (grantResults.size < 1) {
-            return false
-        }
-
-        // Verify that each required permission has been granted, otherwise return false.
-        for (result in grantResults) {
-            if (result != PackageManager.PERMISSION_GRANTED) {
-                return false
-            }
-        }
-        return true
     }
 }
