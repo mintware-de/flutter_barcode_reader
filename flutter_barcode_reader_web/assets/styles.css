@@ -1,0 +1,133 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow: hidden;
+}
+
+#container {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #2F2F2F;
+}
+
+video {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 100vw;
+    object-fit: cover;
+}
+
+#cover {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 70vmin;
+    height: 70vmin;
+    transform: translateX(-50%) translateY(-50%);
+    text-align: center;
+}
+
+#cover:after {
+    content:'';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.4);
+}
+
+#cover img {
+    width: 100%;
+    height: 100%;
+}
+
+#cover > div {
+    background-color: #BFE47B; 
+}
+
+#topleft, #lefttop {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#topleft {
+    width: 8vmin;
+    height: 2vmin;
+}
+
+#lefttop {
+    width: 2vmin;
+    height: 8vmin;
+}
+
+#topright, #righttop {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#topright {
+    width: 8vmin;
+    height: 2vmin;
+}
+
+#righttop {
+    width: 2vmin;
+    height: 8vmin;
+}
+
+#bottomleft, #leftbottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+#bottomleft {
+    width: 8vmin;
+    height: 2vmin;
+}
+
+#leftbottom {
+    width: 2vmin;
+    height: 8vmin;
+}
+
+#bottomright, #rightbottom {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+#bottomright {
+    width: 8vmin;
+    height: 2vmin;
+}
+
+#rightbottom {
+    width: 2vmin;
+    height: 8vmin;
+}
+
+#toolbar {
+    background-color: #2F2F2F;
+}
+
+#toolbar p {
+    float: left;
+    font-size: 24px;
+    color: white;
+    margin-left: 16px;
+    padding: 16px;
+}
+
+#clear {
+    clear: both;
+}
