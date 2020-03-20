@@ -80,7 +80,7 @@ class BarcodeScanPlugin {
   }
 
   void scannerReady() {
-    _scanner = JsQRScanner(onQRCodeScanned, provideVideo);
+    _scanner = JsQRScanner(allowInterop(this.onQRCodeScanned), allowInterop(this.provideVideo));
     _scanner.setSnapImageMaxSize(300);
     var scannerParentElement = document.getElementById('scanner');
     _scanner.appendTo(scannerParentElement);
