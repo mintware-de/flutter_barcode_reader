@@ -88,7 +88,7 @@ class BarcodeScanPlugin {
 
   Promise<MediaStream> provideVideo() {
     return new Promise<MediaStream>(allowInterop((resolve, reject) {
-      window.navigator.getUserMedia(video: true).then(resolve, onError: reject);
+      window.navigator.getUserMedia(video: {'facingMode': 'environment'}).then(resolve, onError: reject);
     }));
   } 
 }
