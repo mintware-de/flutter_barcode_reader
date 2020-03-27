@@ -87,10 +87,27 @@ class BarcodeScanPlugin {
   }
 
   Promise<MediaStream> provideVideo() {
-    return new Promise<MediaStream>(allowInterop((resolve, reject) {
-      window.navigator.getUserMedia(video: {'facingMode': 'environment'}).then(resolve, onError: reject);
-    }));
+    return getUserMedia(new UserMediaOptions(video: new VideoOptions(facingMode: 'environment')));
   } 
+}
+
+@JS("navigator.mediaDevices.getUserMedia")
+external Promise<MediaStream> getUserMedia(UserMediaOptions options);
+
+@JS()
+@anonymous
+class UserMediaOptions {
+  external VideoOptions get video;
+
+  external factory UserMediaOptions({ VideoOptions video });
+}
+
+@JS()
+@anonymous
+class VideoOptions {
+  external String get facingMode;
+
+  external factory VideoOptions({ String facingMode });
 }
 
 @JS()
