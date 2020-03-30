@@ -3,6 +3,7 @@ library jsqrscanner;
 
 import 'dart:async';
 import 'dart:html';
+import 'dart:js';
 
 import 'package:flutter/services.dart';
 import 'package:js/js.dart';
@@ -24,16 +25,26 @@ class BarcodeScanPlugin {
   }
 
   Future<String> handleMethodCall(MethodCall call) async {
+    _ensureMediaDevicesSupported();
     _createCSS();
     var script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
     document.querySelector('head').append(script);
     script.setAttribute('src', 'assets/packages/barcode_scan_web/assets/jsqrscanner.nocache.js');
     _createHTML();
-    document.querySelector('#toolbar p').addEventListener('click', (event) => _close());
+    document.querySelector('#toolbar p').addEventListener('click', (event) => _onCloseByUser());
     setProperty(window, 'JsQRScannerReady', allowInterop(this.scannerReady));
     _completer = new Completer<String>();
     return _completer.future;
+  }
+
+  void _ensureMediaDevicesSupported() {
+    if (window.navigator.mediaDevices == null) {
+      throw PlatformException(
+        code: 'CAMERA_ACCESS_NOT_SUPPORTED',
+        message: "Camera access not supported by browser2"
+      );
+    }
   }
 
   void _createCSS() {
@@ -67,8 +78,18 @@ class BarcodeScanPlugin {
   }
 
   void onQRCodeScanned(String scannedText) {
-    _completer.complete(scannedText);
+    if (!_completer.isCompleted) {
+      _completer.complete(scannedText);
+      _close();
+    }
+  }
+
+  void _onCloseByUser() {
     _close();
+    _completer.completeError(PlatformException(
+      code: 'USER_CANCELED',
+      message: 'User closed the scan window'
+    ));
   }
 
   void _close() {
@@ -87,8 +108,18 @@ class BarcodeScanPlugin {
   }
 
   Promise<MediaStream> provideVideo() {
-    return getUserMedia(new UserMediaOptions(video: new VideoOptions(facingMode: 'environment')));
+    var videoPromise = getUserMedia(new UserMediaOptions(video: new VideoOptions(facingMode: 'environment')));
+    videoPromise.then(null, allowInterop(_reject));
+    return videoPromise;
   } 
+
+  void _reject(reject) {
+    _completer.completeError(PlatformException(
+      code: 'PERMISSION_NOT_GRANTED',
+      message: 'Permission to access the camera not granted'
+    ));
+    _close();
+  }
 }
 
 @JS("navigator.mediaDevices.getUserMedia")
