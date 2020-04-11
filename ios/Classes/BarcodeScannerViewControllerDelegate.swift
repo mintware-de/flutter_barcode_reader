@@ -8,7 +8,7 @@ import Foundation
 
 protocol BarcodeScannerViewControllerDelegate {
     func didScanBarcodeWithResult(_ controller: BarcodeScannerViewController?,
-                                  barcode: String
+                                  scanResult: ScanResult
     )
     
     func didFailWithErrorCode(_ controller: BarcodeScannerViewController?,

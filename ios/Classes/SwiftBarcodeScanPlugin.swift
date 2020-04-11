@@ -56,8 +56,12 @@ public class SwiftBarcodeScanPlugin: NSObject, FlutterPlugin, BarcodeScannerView
         return nil
     }
     
-    func didScanBarcodeWithResult(_ controller: BarcodeScannerViewController?, barcode: String) {
-        result?(barcode)
+    func didScanBarcodeWithResult(_ controller: BarcodeScannerViewController?, scanResult: ScanResult) {
+      do {
+        result?(try scanResult.serializedData())
+      } catch {
+        result?(FlutterError(code: "err_serialize", message: "Failed to serialize the result", details: nil))
+      }
     }
     
     func didFailWithErrorCode(_ controller: BarcodeScannerViewController?, errorCode: String) {
