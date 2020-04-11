@@ -16,7 +16,7 @@ class ActivityHelper(private var applicationContext: Context?,
         const val REQ_START_SCAN = 100
     }
 
-    private val resultMap: HashMap<Int, (requestCode: Int, resultCode: Int, data: Intent?) -> Boolean> = linkedMapOf()
+    private val resultMap: HashMap<Int, ActivityResultHandler> = linkedMapOf()
 
     fun showScannerActivity(result: MethodChannel.Result, config: Protos.Configuration) {
         if (activity == null) {
@@ -24,20 +24,7 @@ class ActivityHelper(private var applicationContext: Context?,
             return
         }
 
-        resultMap[REQ_START_SCAN] = { _, resultCode, data ->
-            if (resultCode == Activity.RESULT_OK) {
-                val barcode = data?.getStringExtra("SCAN_RESULT")
-                if (barcode != null) {
-                    result.success(barcode)
-                } else {
-                    result.error("No barcode was scanned", null, null)
-                }
-            } else {
-                val errorCode = data?.getStringExtra("ERROR_CODE")
-                result.error(errorCode, null, null)
-            }
-            true
-        }
+        resultMap[REQ_START_SCAN] = ScanResultHandler(result)
 
         val intent = Intent(applicationContext, BarcodeScannerActivity::class.java)
         intent.putExtra(BarcodeScannerActivity.EXTRA_CONFIG, config.toByteArray())
@@ -45,9 +32,10 @@ class ActivityHelper(private var applicationContext: Context?,
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (resultMap.containsKey(requestCode)) {
-            return resultMap.getValue(requestCode).invoke(requestCode, resultCode, data)
+        if (!resultMap.containsKey(requestCode)) {
+            return false
         }
-        return false
+
+        return resultMap.getValue(requestCode).handle(requestCode, resultCode, data)
     }
 }

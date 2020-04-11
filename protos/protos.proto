@@ -2,6 +2,18 @@ syntax = "proto3";
 
 option java_package = "de.mintware.barcode_scan";
 
+message AndroidConfiguration {
+    // You can optionally set aspect ratio tolerance level
+    // that is used in calculating the optimal Camera preview size.
+    // On several Huawei devices you need to set this to 0.5.
+    // This parameter is only supported on Android devices.
+    double aspectTolerance = 1;
+
+    // Set to true to enable auto focus
+    // This parameter is only supported on Android devices.
+    bool useAutoFocus = 2;
+}
+
 message Configuration {
     // Strings
     string cancelText = 1;
@@ -13,18 +25,46 @@ message Configuration {
 
     // Index of the camera which should used. -1 uses the default camera
     int32 useCamera = 5;
+
+    // Android specific configuration
+    AndroidConfiguration android = 6;
+
+    // Set to true to automatically enable flash on camera start
+    bool autoEnableFlash = 7;
+}
+
+enum ResultType {
+    Barcode = 0;
+    Cancelled = 1;
+    Error = 2;
+}
+
+message ScanResult {
+    // Represents the type of the result
+    ResultType type = 1;
+
+    // The barcode itself if the result type is barcode.
+    // If the result type is error it contains the error message
+    string rawContent = 2;
+
+    // The barcode format
+    BarcodeFormat format = 3;
+
+    // If the format is unknown, this field holds additional information
+    string formatNote = 4;
 }
 
 enum BarcodeFormat {
-    aztec = 0;
-    code39 = 1;
-    code93 = 2;
-    ean8 = 3;
-    ean13 = 4;
-    code128 = 5;
-    dataMatrix = 6;
-    qr = 7;
-    interleaved2of5 = 8;
-    upce = 9;
-    pdf417 = 10;
+    unknown = 0;
+    aztec = 1;
+    code39 = 2;
+    code93 = 3;
+    ean8 = 4;
+    ean13 = 5;
+    code128 = 6;
+    dataMatrix = 7;
+    qr = 8;
+    interleaved2of5 = 9;
+    upce = 10;
+    pdf417 = 11;
 }

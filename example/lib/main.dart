@@ -1,80 +1,209 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
-  runApp(new MyApp());
+  runApp(_MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class _MyApp extends StatefulWidget {
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  String barcode = "No code was scanned";
-  int numberOfCameras = 0;
-  int selectedCamera = -1;
+class _MyAppState extends State<_MyApp> {
+  ScanResult scanResult;
+
+  final _flashOnController = TextEditingController(text: "Flash on");
+  final _flashOffController = TextEditingController(text: "Flash off");
+  final _cancelController = TextEditingController(text: "Cancel");
+
+  var _aspectTolerance = 0.00;
+  var _numberOfCameras = 0;
+  var _selectedCamera = -1;
+  var _useAutoFocus = true;
+  var _autoEnableFlash = false;
 
   List<BarcodeFormat> selectedFormats = [...BarcodeFormat.values];
 
   @override
+  // ignore: type_annotate_public_apis
   initState() {
     super.initState();
+
     Future.delayed(Duration.zero, () async {
-      numberOfCameras = await BarcodeScanner.numberOfCameras;
+      _numberOfCameras = await BarcodeScanner.numberOfCameras;
       setState(() {});
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> contentList = [
+    var contentList = <Widget>[
+      if (scanResult != null)
+        Card(
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                title: Text("Result Type"),
+                subtitle: Text(scanResult.type?.toString() ?? ""),
+              ),
+              ListTile(
+                title: Text("Raw Content"),
+                subtitle: Text(scanResult.rawContent ?? ""),
+              ),
+              ListTile(
+                title: Text("Format"),
+                subtitle: Text(scanResult.format?.toString() ?? ""),
+              ),
+              ListTile(
+                title: Text("Format note"),
+                subtitle: Text(scanResult.formatNote ?? ""),
+              ),
+            ],
+          ),
+        ),
       ListTile(
         title: Text("Camera selection"),
         dense: true,
         enabled: false,
       ),
       RadioListTile(
-        onChanged: (v) => setState(() => selectedCamera = -1),
+        onChanged: (v) => setState(() => _selectedCamera = -1),
         value: -1,
         title: Text("Default camera"),
-        groupValue: selectedCamera,
-      )
+        groupValue: _selectedCamera,
+      ),
     ];
 
-    for (var i = 0; i < numberOfCameras; i++) {
+    for (var i = 0; i < _numberOfCameras; i++) {
       contentList.add(RadioListTile(
-        onChanged: (v) => setState(() => selectedCamera = i),
+        onChanged: (v) => setState(() => _selectedCamera = i),
         value: i,
         title: Text("Camera ${i + 1}"),
-        groupValue: selectedCamera,
+        groupValue: _selectedCamera,
       ));
     }
-    contentList.add(ListTile(
-      trailing: Checkbox(
-        tristate: true,
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        value: selectedFormats.length == BarcodeFormat.values.length
-            ? true
-            : selectedFormats.length == 0 ? false : null,
-        onChanged: (bool i) {
+
+    contentList.addAll([
+      ListTile(
+        title: Text("Button Texts"),
+        dense: true,
+        enabled: false,
+      ),
+      ListTile(
+        title: TextField(
+          decoration: InputDecoration(
+            hasFloatingPlaceholder: true,
+            labelText: "Flash On",
+          ),
+          controller: _flashOnController,
+        ),
+      ),
+      ListTile(
+        title: TextField(
+          decoration: InputDecoration(
+            hasFloatingPlaceholder: true,
+            labelText: "Flash Off",
+          ),
+          controller: _flashOffController,
+        ),
+      ),
+      ListTile(
+        title: TextField(
+          decoration: InputDecoration(
+            hasFloatingPlaceholder: true,
+            labelText: "Cancel",
+          ),
+          controller: _cancelController,
+        ),
+      ),
+    ]);
+
+    if (Platform.isAndroid) {
+      contentList.addAll([
+        ListTile(
+          title: Text("Android specific options"),
+          dense: true,
+          enabled: false,
+        ),
+        ListTile(
+          title:
+              Text("Aspect tolerance (${_aspectTolerance.toStringAsFixed(2)})"),
+          subtitle: Slider(
+            min: -1.0,
+            max: 1.0,
+            value: _aspectTolerance,
+            onChanged: (value) {
+              setState(() {
+                _aspectTolerance = value;
+              });
+            },
+          ),
+        ),
+        CheckboxListTile(
+          title: Text("Use autofocus"),
+          value: _useAutoFocus,
+          onChanged: (checked) {
+            setState(() {
+              _useAutoFocus = checked;
+            });
+          },
+        )
+      ]);
+    }
+
+    contentList.addAll([
+      ListTile(
+        title: Text("Other options"),
+        dense: true,
+        enabled: false,
+      ),
+      CheckboxListTile(
+        title: Text("Start with flash"),
+        value: _autoEnableFlash,
+        onChanged: (checked) {
           setState(() {
-            selectedFormats = (i ?? false) ? [...BarcodeFormat.values] : [];
+            _autoEnableFlash = checked;
           });
         },
-      ),
-      dense: true,
-      enabled: false,
-      title: Text("Detect barcode formats"),
-      subtitle: Text(
-          "If all are unselected, all possible platform formats will be used"),
-    ));
+      )
+    ]);
 
-    BarcodeFormat.values.forEach((format) {
-      contentList.add(CheckboxListTile(
+    contentList.addAll([
+      ListTile(
+        title: Text("Barcode formats"),
+        dense: true,
+        enabled: false,
+      ),
+      ListTile(
+        trailing: Checkbox(
+          tristate: true,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          value: selectedFormats.length == BarcodeFormat.values.length
+              ? true
+              : selectedFormats.length == 0 ? false : null,
+          onChanged: (checked) {
+            setState(() {
+              selectedFormats = [
+                if (checked ?? false) ...BarcodeFormat.values,
+              ];
+            });
+          },
+        ),
+        dense: true,
+        enabled: false,
+        title: Text("Detect barcode formats"),
+        subtitle: Text(
+          'If all are unselected, all possible platform formats will be used',
+        ),
+      ),
+    ]);
+
+    contentList.addAll(BarcodeFormat.values.map(
+      (format) => CheckboxListTile(
         value: selectedFormats.contains(format),
         onChanged: (i) {
           setState(() => selectedFormats.contains(format)
@@ -82,14 +211,14 @@ class _MyAppState extends State<MyApp> {
               : selectedFormats.add(format));
         },
         title: Text(format.toString()),
-      ));
-    });
+      ),
+    ));
 
-    return new MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Barcode Scanner Example'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Barcode Scanner Example'),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.camera),
@@ -97,10 +226,6 @@ class _MyAppState extends State<MyApp> {
               onPressed: scan,
             )
           ],
-          bottom: AppBar(
-            title: Text(barcode),
-            elevation: 0,
-          ),
         ),
         body: ListView(
           scrollDirection: Axis.vertical,
@@ -113,28 +238,38 @@ class _MyAppState extends State<MyApp> {
 
   Future scan() async {
     try {
-      var config = Configuration();
-      config.cancelText = 'Cancel';
-      config.flashOnText = 'Flash on';
-      config.flashOffText = 'Flash off';
-      config.restrictFormat.addAll(selectedFormats);
-      config.useCamera = selectedCamera;
-      String barcode = await BarcodeScanner.scan(config: config);
+      var config = Configuration()
+            ..cancelText = _cancelController.text
+            ..flashOnText = _flashOnController.text
+            ..flashOffText = _flashOffController.text
+            ..restrictFormat.addAll(selectedFormats)
+            ..useCamera = _selectedCamera
+            ..autoEnableFlash = _autoEnableFlash
+          /**/;
 
-      setState(() => this.barcode = barcode);
-    } on PlatformException catch (e) {
-      if (e.code == BarcodeScanner.CameraAccessDenied) {
+      if (Platform.isAndroid) {
+        config.android.createEmptyInstance()
+          ..aspectTolerance = _aspectTolerance
+          ..useAutoFocus = _useAutoFocus;
+      }
+
+      var result = await BarcodeScanner.scan(config: config);
+
+      setState(() => scanResult = result);
+    } on dynamic catch (e) {
+      var result = ScanResult()
+        ..type = ResultType.Error
+        ..format = BarcodeFormat.unknown;
+      if (e.code == BarcodeScanner.cameraAccessDenied) {
         setState(() {
-          this.barcode = 'The user did not grant the camera permission!';
+          result.rawContent = 'The user did not grant the camera permission!';
         });
       } else {
-        setState(() => this.barcode = 'Unknown error: $e');
+        result.rawContent = 'Unknown error: $e';
       }
-    } on FormatException {
-      setState(() => this.barcode =
-          'null (User returned using the "back"-button before scanning anything. Result)');
-    } catch (e) {
-      setState(() => this.barcode = 'Unknown error: $e');
+      setState(() {
+        scanResult = result;
+      });
     }
   }
 }

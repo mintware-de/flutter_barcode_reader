@@ -18,10 +18,27 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     private lateinit var scannerView: ZXingAutofocusScannerView
     private lateinit var config: Protos.Configuration
 
+
     companion object {
         const val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         const val TOGGLE_FLASH = 200
         const val EXTRA_CONFIG = "config"
+        const val EXTRA_RESULT = "scan_result"
+        const val EXTRA_ERROR_CODE = "error_code"
+
+        private val formatMap: Map<Protos.BarcodeFormat, BarcodeFormat> = mapOf(
+                Protos.BarcodeFormat.aztec to BarcodeFormat.AZTEC,
+                Protos.BarcodeFormat.code39 to BarcodeFormat.CODE_39,
+                Protos.BarcodeFormat.code93 to BarcodeFormat.CODE_93,
+                Protos.BarcodeFormat.code128 to BarcodeFormat.CODE_128,
+                Protos.BarcodeFormat.dataMatrix to BarcodeFormat.DATA_MATRIX,
+                Protos.BarcodeFormat.ean8 to BarcodeFormat.EAN_8,
+                Protos.BarcodeFormat.ean13 to BarcodeFormat.EAN_13,
+                Protos.BarcodeFormat.interleaved2of5 to BarcodeFormat.ITF,
+                Protos.BarcodeFormat.pdf417 to BarcodeFormat.PDF_417,
+                Protos.BarcodeFormat.qr to BarcodeFormat.QR_CODE,
+                Protos.BarcodeFormat.upce to BarcodeFormat.UPC_E
+        )
     }
 
     // region Activity lifecycle
@@ -32,7 +49,8 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
         title = ""
         scannerView = ZXingAutofocusScannerView(this)
-        scannerView.setAutoFocus(true)
+
+        scannerView.setAutoFocus(config.android.useAutoFocus)
 
         val restrictedFormats = mapRestrictedBarcodeTypes()
         if (restrictedFormats.isNotEmpty()) {
@@ -40,7 +58,12 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         }
 
         // this parameter will make your HUAWEI phone works great!
-        scannerView.setAspectTolerance(0.5f)
+        scannerView.setAspectTolerance(config.android.aspectTolerance.toFloat())
+        if (config.autoEnableFlash) {
+            scannerView.flash = config.autoEnableFlash
+            this.invalidateOptionsMenu()
+        }
+
         setContentView(scannerView)
     }
 
@@ -81,15 +104,35 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     override fun handleResult(result: Result?) {
         val intent = Intent()
-        intent.putExtra("SCAN_RESULT", result.toString())
-        setResult(RESULT_OK, intent)
-        finish()
-    }
 
-    private fun finishWithError(errorCode: String) {
-        val intent = Intent()
-        intent.putExtra("ERROR_CODE", errorCode)
-        setResult(RESULT_CANCELED, intent)
+        val builder = Protos.ScanResult.newBuilder()
+        if (result == null) {
+
+            builder.let {
+                it.format = Protos.BarcodeFormat.unknown
+                it.rawContent = "No data was scanned"
+                it.type = Protos.ResultType.Error
+            }
+        } else {
+
+            val format = (formatMap.filterValues { it == result.barcodeFormat }.keys.firstOrNull()
+                    ?: Protos.BarcodeFormat.unknown)
+
+            var formatNote = ""
+            if (format == Protos.BarcodeFormat.unknown) {
+                formatNote = result.barcodeFormat.toString()
+            }
+
+            builder.let {
+                it.format = format
+                it.formatNote = formatNote
+                it.rawContent = result.text
+                it.type = Protos.ResultType.Barcode
+            }
+        }
+        val res = builder.build()
+        intent.putExtra(EXTRA_RESULT, res.toByteArray())
+        setResult(RESULT_OK, intent)
         finish()
     }
 
@@ -102,16 +145,22 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         return false
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        if (requestCode == REQUEST_TAKE_PHOTO_CAMERA_PERMISSION) {
-            if (verifyPermissions(grantResults)) {
-                startCamera()
-            } else {
-                finishWithError("PERMISSION_NOT_GRANTED")
-            }
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<out String>,
+                                            grantResults: IntArray
+    ) {
+        if (requestCode != REQUEST_TAKE_PHOTO_CAMERA_PERMISSION) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
             return
         }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (verifyPermissions(grantResults)) {
+            startCamera()
+        } else {
+            val intent = Intent()
+            intent.putExtra(EXTRA_ERROR_CODE, "PERMISSION_NOT_GRANTED")
+            setResult(RESULT_CANCELED, intent)
+            finish()
+        }
     }
 
     private fun startCamera() {
@@ -139,20 +188,12 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         val types: MutableList<BarcodeFormat> = mutableListOf()
 
         this.config.restrictFormatList.filterNotNull().forEach {
-            when (it) {
-                Protos.BarcodeFormat.aztec -> types.add(BarcodeFormat.AZTEC)
-                Protos.BarcodeFormat.code39 -> types.add(BarcodeFormat.CODE_39)
-                Protos.BarcodeFormat.code93 -> types.add(BarcodeFormat.CODE_93)
-                Protos.BarcodeFormat.code128 -> types.add(BarcodeFormat.CODE_128)
-                Protos.BarcodeFormat.dataMatrix -> types.add(BarcodeFormat.DATA_MATRIX)
-                Protos.BarcodeFormat.ean8 -> types.add(BarcodeFormat.EAN_8)
-                Protos.BarcodeFormat.ean13 -> types.add(BarcodeFormat.EAN_13)
-                Protos.BarcodeFormat.interleaved2of5 -> types.add(BarcodeFormat.ITF)
-                Protos.BarcodeFormat.pdf417 -> types.add(BarcodeFormat.PDF_417)
-                Protos.BarcodeFormat.qr -> types.add(BarcodeFormat.QR_CODE)
-                Protos.BarcodeFormat.upce -> types.add(BarcodeFormat.UPC_E)
-                Protos.BarcodeFormat.UNRECOGNIZED -> print("Unrecognized")
+            if (!formatMap.containsKey(it)) {
+                print("Unrecognized")
+                return@forEach
             }
+
+            types.add(formatMap.getValue(it))
         }
 
         return types
