@@ -15,9 +15,13 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView
 
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
-    private lateinit var scannerView: ZXingAutofocusScannerView
-    private lateinit var config: Protos.Configuration
+    init {
+        title = ""
+    }
 
+    private lateinit var config: Protos.Configuration
+    private var scannerView: ZXingAutofocusScannerView? = null
+    private var scannerViewInitialized: Boolean = false
 
     companion object {
         const val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
@@ -46,38 +50,43 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         super.onCreate(savedInstanceState)
 
         config = Protos.Configuration.parseFrom(intent.extras!!.getByteArray(EXTRA_CONFIG))
+    }
 
-        title = ""
-        scannerView = ZXingAutofocusScannerView(this)
-
-        scannerView.setAutoFocus(config.android.useAutoFocus)
-
-        val restrictedFormats = mapRestrictedBarcodeTypes()
-        if (restrictedFormats.isNotEmpty()) {
-            scannerView.setFormats(restrictedFormats)
+    private fun setupScannerView() {
+        if (scannerViewInitialized) {
+            return
         }
 
-        // this parameter will make your HUAWEI phone works great!
-        scannerView.setAspectTolerance(config.android.aspectTolerance.toFloat())
-        if (config.autoEnableFlash) {
-            scannerView.flash = config.autoEnableFlash
-            this.invalidateOptionsMenu()
+        scannerView = ZXingAutofocusScannerView(this).apply {
+            setAutoFocus(config.android.useAutoFocus)
+            val restrictedFormats = mapRestrictedBarcodeTypes()
+            if (restrictedFormats.isNotEmpty()) {
+                setFormats(restrictedFormats)
+            }
+
+            // this parameter will make your HUAWEI phone works great!
+            setAspectTolerance(config.android.aspectTolerance.toFloat())
+            if (config.autoEnableFlash) {
+                scannerView.flash = config.autoEnableFlash
+                this.invalidateOptionsMenu()
+            }
         }
 
         setContentView(scannerView)
+        scannerViewInitialized = true
     }
 
     override fun onPause() {
-        scannerView.stopCamera()
+        scannerView?.stopCamera()
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        scannerView.setResultHandler(this)
 
-        // start camera immediately if permission is already given
         if (!requestCameraAccessIfNecessary()) {
+            setupScannerView()
+            scannerView?.setResultHandler(this)
             startCamera()
         }
     }
@@ -85,16 +94,18 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     // region AppBar menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val buttonText = if (scannerView.flash) config.flashOffText else config.flashOnText
-        val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        scannerView?.also {
+            val buttonText = if (it.flash) config.flashOffText else config.flashOnText
+            val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
 
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == TOGGLE_FLASH) {
-            scannerView.flash = !scannerView.flash
+            scannerView?.toggleFlash()
             this.invalidateOptionsMenu()
             return true
         }
@@ -164,10 +175,12 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     private fun startCamera() {
-        if (config.useCamera > -1) {
-            scannerView.startCamera(config.useCamera)
-        } else {
-            scannerView.startCamera()
+        scannerView?.run {
+            if (config.useCamera > -1) {
+                startCamera(config.useCamera)
+            } else {
+                startCamera()
+            }
         }
     }
 
