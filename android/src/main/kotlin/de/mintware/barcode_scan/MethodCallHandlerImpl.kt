@@ -16,9 +16,15 @@ class MethodCallHandlerImpl(private val activityHelper: ActivityHelper
     @Suppress("unused")
     fun scan(call: MethodCall, result: MethodChannel.Result) {
         var config: Protos.Configuration = Protos.Configuration.newBuilder()
-                .setCancelText("Cancel")
-                .setFlashOnText("Flash On")
-                .setFlashOffText("Flash Off")
+                .putAllStrings(mapOf(
+                        "cancel" to "Cancel",
+                        "flash_on" to "Flash on",
+                        "flash_off" to "Flash off"
+                ))
+                .setAndroid(Protos.AndroidConfiguration
+                        .newBuilder()
+                        .setAspectTolerance(0.5)
+                        .setUseAutoFocus(true))
                 .addAllRestrictFormat(mutableListOf())
                 .setUseCamera(-1)
                 .build()

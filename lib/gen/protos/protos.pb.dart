@@ -56,13 +56,11 @@ class AndroidConfiguration extends $pb.GeneratedMessage {
 
 class Configuration extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo('Configuration', createEmptyInstance: create)
-    ..aOS(1, 'cancelText', protoName: 'cancelText')
-    ..aOS(2, 'flashOnText', protoName: 'flashOnText')
-    ..aOS(3, 'flashOffText', protoName: 'flashOffText')
-    ..pc<BarcodeFormat>(4, 'restrictFormat', $pb.PbFieldType.PE, protoName: 'restrictFormat', valueOf: BarcodeFormat.valueOf, enumValues: BarcodeFormat.values)
-    ..a<$core.int>(5, 'useCamera', $pb.PbFieldType.O3, protoName: 'useCamera')
-    ..aOM<AndroidConfiguration>(6, 'android', subBuilder: AndroidConfiguration.create)
-    ..aOB(7, 'autoEnableFlash', protoName: 'autoEnableFlash')
+    ..m<$core.String, $core.String>(1, 'strings', entryClassName: 'Configuration.StringsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS)
+    ..pc<BarcodeFormat>(2, 'restrictFormat', $pb.PbFieldType.PE, protoName: 'restrictFormat', valueOf: BarcodeFormat.valueOf, enumValues: BarcodeFormat.values)
+    ..a<$core.int>(3, 'useCamera', $pb.PbFieldType.O3, protoName: 'useCamera')
+    ..aOM<AndroidConfiguration>(4, 'android', subBuilder: AndroidConfiguration.create)
+    ..aOB(5, 'autoEnableFlash', protoName: 'autoEnableFlash')
     ..hasRequiredFields = false
   ;
 
@@ -82,63 +80,39 @@ class Configuration extends $pb.GeneratedMessage {
   static Configuration _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get cancelText => $_getSZ(0);
-  @$pb.TagNumber(1)
-  set cancelText($core.String v) { $_setString(0, v); }
-  @$pb.TagNumber(1)
-  $core.bool hasCancelText() => $_has(0);
-  @$pb.TagNumber(1)
-  void clearCancelText() => clearField(1);
+  $core.Map<$core.String, $core.String> get strings => $_getMap(0);
 
   @$pb.TagNumber(2)
-  $core.String get flashOnText => $_getSZ(1);
-  @$pb.TagNumber(2)
-  set flashOnText($core.String v) { $_setString(1, v); }
-  @$pb.TagNumber(2)
-  $core.bool hasFlashOnText() => $_has(1);
-  @$pb.TagNumber(2)
-  void clearFlashOnText() => clearField(2);
+  $core.List<BarcodeFormat> get restrictFormat => $_getList(1);
 
   @$pb.TagNumber(3)
-  $core.String get flashOffText => $_getSZ(2);
+  $core.int get useCamera => $_getIZ(2);
   @$pb.TagNumber(3)
-  set flashOffText($core.String v) { $_setString(2, v); }
+  set useCamera($core.int v) { $_setSignedInt32(2, v); }
   @$pb.TagNumber(3)
-  $core.bool hasFlashOffText() => $_has(2);
+  $core.bool hasUseCamera() => $_has(2);
   @$pb.TagNumber(3)
-  void clearFlashOffText() => clearField(3);
+  void clearUseCamera() => clearField(3);
 
   @$pb.TagNumber(4)
-  $core.List<BarcodeFormat> get restrictFormat => $_getList(3);
+  AndroidConfiguration get android => $_getN(3);
+  @$pb.TagNumber(4)
+  set android(AndroidConfiguration v) { setField(4, v); }
+  @$pb.TagNumber(4)
+  $core.bool hasAndroid() => $_has(3);
+  @$pb.TagNumber(4)
+  void clearAndroid() => clearField(4);
+  @$pb.TagNumber(4)
+  AndroidConfiguration ensureAndroid() => $_ensure(3);
 
   @$pb.TagNumber(5)
-  $core.int get useCamera => $_getIZ(4);
+  $core.bool get autoEnableFlash => $_getBF(4);
   @$pb.TagNumber(5)
-  set useCamera($core.int v) { $_setSignedInt32(4, v); }
+  set autoEnableFlash($core.bool v) { $_setBool(4, v); }
   @$pb.TagNumber(5)
-  $core.bool hasUseCamera() => $_has(4);
+  $core.bool hasAutoEnableFlash() => $_has(4);
   @$pb.TagNumber(5)
-  void clearUseCamera() => clearField(5);
-
-  @$pb.TagNumber(6)
-  AndroidConfiguration get android => $_getN(5);
-  @$pb.TagNumber(6)
-  set android(AndroidConfiguration v) { setField(6, v); }
-  @$pb.TagNumber(6)
-  $core.bool hasAndroid() => $_has(5);
-  @$pb.TagNumber(6)
-  void clearAndroid() => clearField(6);
-  @$pb.TagNumber(6)
-  AndroidConfiguration ensureAndroid() => $_ensure(5);
-
-  @$pb.TagNumber(7)
-  $core.bool get autoEnableFlash => $_getBF(6);
-  @$pb.TagNumber(7)
-  set autoEnableFlash($core.bool v) { $_setBool(6, v); }
-  @$pb.TagNumber(7)
-  $core.bool hasAutoEnableFlash() => $_has(6);
-  @$pb.TagNumber(7)
-  void clearAutoEnableFlash() => clearField(7);
+  void clearAutoEnableFlash() => clearField(5);
 }
 
 class ScanResult extends $pb.GeneratedMessage {

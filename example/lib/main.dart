@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(_MyApp());
@@ -26,7 +27,10 @@ class _MyAppState extends State<_MyApp> {
   var _useAutoFocus = true;
   var _autoEnableFlash = false;
 
-  List<BarcodeFormat> selectedFormats = [...BarcodeFormat.values];
+  static final _possibleFormats = BarcodeFormat.values.toList()
+    ..removeWhere((e) => e == BarcodeFormat.unknown);
+
+  List<BarcodeFormat> selectedFormats = [..._possibleFormats];
 
   @override
   // ignore: type_annotate_public_apis
@@ -182,13 +186,13 @@ class _MyAppState extends State<_MyApp> {
         trailing: Checkbox(
           tristate: true,
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          value: selectedFormats.length == BarcodeFormat.values.length
+          value: selectedFormats.length == _possibleFormats.length
               ? true
               : selectedFormats.length == 0 ? false : null,
           onChanged: (checked) {
             setState(() {
               selectedFormats = [
-                if (checked ?? false) ...BarcodeFormat.values,
+                if (checked ?? false) ..._possibleFormats,
               ];
             });
           },
@@ -202,7 +206,7 @@ class _MyAppState extends State<_MyApp> {
       ),
     ]);
 
-    contentList.addAll(BarcodeFormat.values.map(
+    contentList.addAll(_possibleFormats.map(
       (format) => CheckboxListTile(
         value: selectedFormats.contains(format),
         onChanged: (i) {
@@ -238,28 +242,30 @@ class _MyAppState extends State<_MyApp> {
 
   Future scan() async {
     try {
-      var config = Configuration()
-            ..cancelText = _cancelController.text
-            ..flashOnText = _flashOnController.text
-            ..flashOffText = _flashOffController.text
-            ..restrictFormat.addAll(selectedFormats)
-            ..useCamera = _selectedCamera
-            ..autoEnableFlash = _autoEnableFlash
-          /**/;
+      var options = ScanOptions(
+        strings: {
+          "cancel": _cancelController.text,
+          "flash_on": _flashOnController.text,
+          "flash_off": _flashOffController.text,
+        },
+        restrictFormat: selectedFormats,
+        useCamera: _selectedCamera,
+        autoEnableFlash: _autoEnableFlash,
+        android: AndroidOptions(
+          aspectTolerance: _aspectTolerance,
+          useAutoFocus: _useAutoFocus,
+        ),
+      );
 
-      if (Platform.isAndroid) {
-        config.android.createEmptyInstance()
-          ..aspectTolerance = _aspectTolerance
-          ..useAutoFocus = _useAutoFocus;
-      }
-
-      var result = await BarcodeScanner.scan(config: config);
+      var result = await BarcodeScanner.scan(options: options);
 
       setState(() => scanResult = result);
-    } on dynamic catch (e) {
-      var result = ScanResult()
-        ..type = ResultType.Error
-        ..format = BarcodeFormat.unknown;
+    } on PlatformException catch (e) {
+      var result = ScanResult(
+        type: ResultType.Error,
+        format: BarcodeFormat.unknown,
+      );
+
       if (e.code == BarcodeScanner.cameraAccessDenied) {
         setState(() {
           result.rawContent = 'The user did not grant the camera permission!';

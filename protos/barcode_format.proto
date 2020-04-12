@@ -1,0 +1,18 @@
+syntax = "proto3";
+package de.mintware.barcode_scan;
+option java_package = "de.mintware.barcode_scan";
+
+enum BarcodeFormat {
+    unknown = 0;
+    aztec = 1;
+    code39 = 2;
+    code93 = 3;
+    ean8 = 4;
+    ean13 = 5;
+    code128 = 6;
+    dataMatrix = 7;
+    qr = 8;
+    interleaved2of5 = 9;
+    upce = 10;
+    pdf417 = 11;
+}

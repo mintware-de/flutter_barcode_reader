@@ -75,6 +75,55 @@ To use on iOS, you must add the the camera usage description to your Info.plist
 </dict>
 ```
 
+
+## Usage
+
+```dart
+
+import 'package:barcode_scan/barcode_scan.dart';
+
+void main() async {
+  var result = await BarcodeScanner.scan();
+  
+  print(result.type); // The result type (barcode, cancelled, failed)
+  print(result.rawContent); // The barcode content
+  print(result.format); // The barcode format (as enum)
+  print(result.formatNote); // If a unknown format was scanned this field contains a note
+}
+```
+
+
+## Advanced usage
+You can pass options to the scan method:
+
+```dart
+
+import 'package:barcode_scan/barcode_scan.dart';
+
+void main() async {
+  
+  var options = ScanOptions(
+    // set the options
+  );
+
+  var result = await BarcodeScanner.scan(options: options);
+  
+  // ...
+}
+```
+
+### Supported options
+| Option                     | Type              | Description                                                                               | Supported by  |
+|----------------------------|-------------------|-------------------------------------------------------------------------------------------|---------------|
+| `strings.cancel`           | `String`          | The cancel button text on iOS                                                             | iOS only      |
+| `strings.flash_on`         | `String`          | The flash on button text                                                                  | iOS + Android |
+| `strings.flash_off`        | `String`          | The flash off button text                                                                 | iOS + Android |
+| `restrictFormat`           | `BarcodeFormat[]` | Restrict the formats which are recognized                                                 | iOS + Android |
+| `useCamera`                | `int`             | The index of the camera which is used for scanning (See `BarcodeScanner.numberOfCameras`) | iOS + Android |
+| `autoEnableFlash`          | `bool`            | Enable the flash when start scanning                                                      | iOS + Android |
+| `android.aspectTolerance`  | `double`          | Enable the flash when start scanning                                                      | Android only  |
+| `android.useAutoFocus`     | `bool`            | Enable the flash when start scanning                                                      | Android only  |
+
 ## Development setup
 
 ###  Setup protobuf

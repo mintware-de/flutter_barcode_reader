@@ -7,5 +7,5 @@ include: package:effective_dart/analysis_options.yaml
 #     - camel_case_types
 
 analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
+  exclude:
+    - lib/gen/**

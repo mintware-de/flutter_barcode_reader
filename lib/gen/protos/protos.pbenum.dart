@@ -9,23 +9,6 @@
 import 'dart:core' as $core;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class ResultType extends $pb.ProtobufEnum {
-  static const ResultType Barcode = ResultType._(0, 'Barcode');
-  static const ResultType Cancelled = ResultType._(1, 'Cancelled');
-  static const ResultType Error = ResultType._(2, 'Error');
-
-  static const $core.List<ResultType> values = <ResultType> [
-    Barcode,
-    Cancelled,
-    Error,
-  ];
-
-  static final $core.Map<$core.int, ResultType> _byValue = $pb.ProtobufEnum.initByValue(values);
-  static ResultType valueOf($core.int value) => _byValue[value];
-
-  const ResultType._($core.int v, $core.String n) : super(v, n);
-}
-
 class BarcodeFormat extends $pb.ProtobufEnum {
   static const BarcodeFormat unknown = BarcodeFormat._(0, 'unknown');
   static const BarcodeFormat aztec = BarcodeFormat._(1, 'aztec');
@@ -59,5 +42,22 @@ class BarcodeFormat extends $pb.ProtobufEnum {
   static BarcodeFormat valueOf($core.int value) => _byValue[value];
 
   const BarcodeFormat._($core.int v, $core.String n) : super(v, n);
+}
+
+class ResultType extends $pb.ProtobufEnum {
+  static const ResultType Barcode = ResultType._(0, 'Barcode');
+  static const ResultType Cancelled = ResultType._(1, 'Cancelled');
+  static const ResultType Error = ResultType._(2, 'Error');
+
+  static const $core.List<ResultType> values = <ResultType> [
+    Barcode,
+    Cancelled,
+    Error,
+  ];
+
+  static final $core.Map<$core.int, ResultType> _byValue = $pb.ProtobufEnum.initByValue(values);
+  static ResultType valueOf($core.int value) => _byValue[value];
+
+  const ResultType._($core.int v, $core.String n) : super(v, n);
 }
 

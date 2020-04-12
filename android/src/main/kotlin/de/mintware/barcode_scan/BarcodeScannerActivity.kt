@@ -95,7 +95,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     // region AppBar menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         scannerView?.also {
-            val buttonText = if (it.flash) config.flashOffText else config.flashOnText
+            val buttonText = (if (it.flash) config.stringsMap["flash_off"] else config.stringsMap["flash_on"])
             val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         }

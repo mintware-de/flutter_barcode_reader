@@ -14,9 +14,11 @@ class BarcodeScannerViewController: UIViewController {
   private var scanner: MTBBarcodeScanner?
   
   var config: Configuration = Configuration.with {
-    $0.cancelText = "Cancel"
-    $0.flashOnText = "Flash On"
-    $0.flashOffText = "Flash Off"
+    $0.strings = [
+      "cancel" : "Cancel",
+      "flash_on" : "Flash on",
+      "flash_off" : "Flash off",
+    ]
     $0.useCamera = -1 // Default camera
     $0.autoEnableFlash = false
   }
@@ -71,7 +73,7 @@ class BarcodeScannerViewController: UIViewController {
                                   previewView: previewView
       )
     }
-    navigationItem.leftBarButtonItem = UIBarButtonItem(title: config.cancelText,
+    navigationItem.leftBarButtonItem = UIBarButtonItem(title: config.strings["cancel"],
                                                         style: .plain,
                                                         target: self,
                                                         action: #selector(cancel)
@@ -175,7 +177,7 @@ class BarcodeScannerViewController: UIViewController {
       return
     }
     
-    let buttonText = isFlashOn ? config.flashOffText : config.flashOnText
+    let buttonText = isFlashOn ? config.strings["flash_off"] : config.strings["flash_on"]
     navigationItem.rightBarButtonItem = UIBarButtonItem(title: buttonText,
                                                         style: .plain,
                                                         target: self,
