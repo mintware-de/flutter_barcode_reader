@@ -22,6 +22,8 @@ public class SwiftBarcodeScanPlugin: NSObject, FlutterPlugin, BarcodeScannerView
             showBarcodeView(config: configuration)}
         else if ("numberOfCameras" == call.method) {
             result(AVCaptureDevice.devices(for: .video).count)
+        } else if ("requestCameraPermission" == call.method) {
+            result(false)
         } else {
             result(FlutterMethodNotImplemented)
         }

@@ -16,7 +16,6 @@ class ZXingAutofocusScannerView(context: Context) : ZXingScannerView(context) {
                 parameters.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE
                 cameraWrapper.mCamera.parameters = parameters
             } catch (ex: Exception) {
-                Log.e("ZXing", "Failed to set CONTINOUS_PICTURE", ex)
                 callbackFocus = true
             }
         }
