@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
 
@@ -31,6 +32,9 @@ class BarcodeScanner {
     ScanOptions options = const ScanOptions(),
   }) async {
     assert(options != null);
+    if (Platform.isIOS) {
+      return _doScan(options);
+    }
 
     var events = _eventChannel.receiveBroadcastStream();
     var completer = Completer<ScanResult>();
