@@ -1,57 +1,79 @@
 package de.mintware.barcode_scan
 
-import android.app.Activity
-import android.content.Intent
-import android.util.Log
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry
+import androidx.annotation.NonNull
+import androidx.annotation.Nullable
+import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-class BarcodeScanPlugin(private val registrar: Registrar) : MethodCallHandler, PluginRegistry.ActivityResultListener {
-    var result: Result? = null
+/** BarcodeScanPlugin */
+class BarcodeScanPlugin : FlutterPlugin, ActivityAware {
 
+    @Nullable
+    private var methodCallHandler: MethodCallHandlerImpl? = null
+    @Nullable
+    private var activityHelper: ActivityHelper? = null
+
+    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+        activityHelper = ActivityHelper(flutterPluginBinding.applicationContext)
+
+        methodCallHandler = MethodCallHandlerImpl(activityHelper!!)
+        methodCallHandler!!.startListening(flutterPluginBinding.binaryMessenger)
+    }
+
+    // This static function is optional and equivalent to onAttachedToEngine. It supports the old
+    // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
+    // plugin registration via this function while apps migrate to use the new Android APIs
+    // post-flutter-1.12 via https://flutter.dev/go/android-project-migration.
+    //
+    // It is encouraged to share logic between onAttachedToEngine and registerWith to keep
+    // them functionally equivalent. Only one of onAttachedToEngine or registerWith will be called
+    // depending on the user's project. onAttachedToEngine or registerWith must both be defined
+    // in the same class.
     companion object {
+        @Suppress("unused")
         @JvmStatic
         fun registerWith(registrar: Registrar) {
-            val channel = MethodChannel(registrar.messenger(), "de.mintware.barcode_scan")
-            val plugin = BarcodeScanPlugin(registrar)
-            channel.setMethodCallHandler(plugin)
-            registrar.addActivityResultListener(plugin)
+            val handler = MethodCallHandlerImpl(ActivityHelper(
+                    registrar.context(),
+                    registrar.activity()
+            ))
+            handler.startListening(registrar.messenger())
         }
     }
 
-    override fun onMethodCall(call: MethodCall, result: Result) {
-        if (call.method == "scan") {
-            this.result = result
-            showBarcodeView()
-        } else {
-            result.notImplemented()
-        }
-    }
-
-    private fun showBarcodeView() {
-        if (registrar.activity() == null) {
-            Log.e("BarcodeScanPlugin", "plugin can't launch scan activity, because plugin is not attached to any activity.")
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        if (methodCallHandler == null) {
             return
         }
-        val intent = Intent(registrar.activity(), BarcodeScannerActivity::class.java)
-        registrar.activity().startActivityForResult(intent, 100)
+
+        methodCallHandler!!.stopListening()
+        methodCallHandler = null
+        activityHelper = null
     }
 
-    override fun onActivityResult(code: Int, resultCode: Int, data: Intent?): Boolean {
-        if (code == 100) {
-            if (resultCode == Activity.RESULT_OK) {
-                val barcode = data?.getStringExtra("SCAN_RESULT")
-                barcode?.let { this.result?.success(barcode) }
-            } else {
-                val errorCode = data?.getStringExtra("ERROR_CODE")
-                this.result?.error(errorCode, null, null)
-            }
-            return true
+    override fun onDetachedFromActivity() {
+        if (methodCallHandler == null) {
+            return
         }
-        return false
+
+        activityHelper!!.activity = null
+    }
+
+    override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+        onAttachedToActivity(binding)
+    }
+
+    override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+        if (methodCallHandler == null) {
+            return
+        }
+        binding.addActivityResultListener(activityHelper!!)
+        activityHelper!!.activity = binding.activity
+    }
+
+    override fun onDetachedFromActivityForConfigChanges() {
+        onDetachedFromActivity()
     }
 }
