@@ -1,0 +1,26 @@
+syntax = "proto3";
+package de.mintware.barcode_scan;
+option java_package = "de.mintware.barcode_scan";
+
+import "barcode_format.proto";
+
+enum ResultType {
+    Barcode = 0;
+    Cancelled = 1;
+    Error = 2;
+}
+
+message ScanResult {
+    // Represents the type of the result
+    ResultType type = 1;
+
+    // The barcode itself if the result type is barcode.
+    // If the result type is error it contains the error message
+    string rawContent = 2;
+
+    // The barcode format
+    BarcodeFormat format = 3;
+
+    // If the format is unknown, this field holds additional information
+    string formatNote = 4;
+}

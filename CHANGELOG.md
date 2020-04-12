@@ -1,3 +1,21 @@
+## v3.0.0-dev.1 - 2020-04-12
+
+Changes:
+- [Rewrite platform communication](https://github.com/mintware-de/flutter_barcode_reader/pull/185) - @devtronic
+  - This provides a better way to configure the plugin
+  - iOS code migrated to Swift
+  - Android code migrated to FlutterPlugin
+  - Platform communication with protobuf
+  - Retrieve the number of available cameras with `BarcodeScanner.numberOfCameras`
+  - Flexible configuration:
+  - Set the strings for the flash on/off and the cancel button
+  - Restrict the detected barcode formats
+  - Set which camera is used for scanning barcodes
+
+**BREAKING CHANGES**:
+- minSdk version on Android is now 18
+- `BarcodeScanner.scan()` returns a `ScanResult` object. Check [UPGRADE.md](./UPGRADE.md) for migration details.
+
 ## v2.0.1 - 2020-02-19
 
 Bugfixes:
