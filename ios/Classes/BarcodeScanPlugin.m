@@ -14,6 +14,8 @@
     if ([@"scan" isEqualToString:call.method]) {
         self.result = result;
         [self showBarcodeView];
+    } else if ([@"request_permission" isEqualToString:call.method]) {
+        result(@(NO));
     } else {
         result(FlutterMethodNotImplemented);
     }
