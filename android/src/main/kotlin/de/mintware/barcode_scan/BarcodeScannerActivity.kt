@@ -1,14 +1,10 @@
 package de.mintware.barcode_scan
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
@@ -20,11 +16,10 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     private lateinit var config: Protos.Configuration
-    private var scannerView: ZXingAutofocusScannerView? = null
+    lateinit var scannerView: ZXingScannerView
     private var scannerViewInitialized: Boolean = false
 
     companion object {
-        const val REQUEST_TAKE_PHOTO_CAMERA_PERMISSION = 100
         const val TOGGLE_FLASH = 200
         const val EXTRA_CONFIG = "config"
         const val EXTRA_RESULT = "scan_result"
@@ -43,6 +38,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
                 Protos.BarcodeFormat.qr to BarcodeFormat.QR_CODE,
                 Protos.BarcodeFormat.upce to BarcodeFormat.UPC_E
         )
+
     }
 
     // region Activity lifecycle
@@ -76,40 +72,36 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         scannerViewInitialized = true
     }
 
-    override fun onPause() {
-        scannerView?.stopCamera()
-        super.onPause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (!requestCameraAccessIfNecessary()) {
-            setupScannerView()
-            scannerView?.setResultHandler(this)
-            startCamera()
-        }
-    }
-    // endregion
-
     // region AppBar menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        scannerView?.also {
-            val buttonText = (if (it.flash) config.stringsMap["flash_off"] else config.stringsMap["flash_on"])
-            val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
-            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        var buttonText = config.stringsMap["flash_on"]
+        if (scannerView.flash) {
+            buttonText = config.stringsMap["flash_off"]
         }
-
+        val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == TOGGLE_FLASH) {
-            scannerView?.toggleFlash()
+            scannerView.toggleFlash()
             this.invalidateOptionsMenu()
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        scannerView.stopCamera()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setupScannerView()
+        scannerView.setResultHandler(this)
+        scannerView.startCamera()
     }
     // endregion
 
@@ -147,56 +139,6 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         finish()
     }
 
-    private fun requestCameraAccessIfNecessary(): Boolean {
-        val array = arrayOf(Manifest.permission.CAMERA)
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, array, REQUEST_TAKE_PHOTO_CAMERA_PERMISSION)
-            return true
-        }
-        return false
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<out String>,
-                                            grantResults: IntArray
-    ) {
-        if (requestCode != REQUEST_TAKE_PHOTO_CAMERA_PERMISSION) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            return
-        }
-        if (verifyPermissions(grantResults)) {
-            startCamera()
-        } else {
-            val intent = Intent()
-            intent.putExtra(EXTRA_ERROR_CODE, "PERMISSION_NOT_GRANTED")
-            setResult(RESULT_CANCELED, intent)
-            finish()
-        }
-    }
-
-    private fun startCamera() {
-        scannerView?.run {
-            if (config.useCamera > -1) {
-                startCamera(config.useCamera)
-            } else {
-                startCamera()
-            }
-        }
-    }
-
-    /**
-     * Check that all given permissions have been granted by verifying that each entry in the
-     * given array is of the value [PackageManager.PERMISSION_GRANTED].
-
-     * @see Activity.onRequestPermissionsResult
-     */
-    private fun verifyPermissions(grantResults: IntArray): Boolean {
-        // Verify that each required permission has been granted, otherwise return false.
-        return grantResults.isNotEmpty() && grantResults.all {
-            it == PackageManager.PERMISSION_GRANTED
-        }
-    }
-
     private fun mapRestrictedBarcodeTypes(): List<BarcodeFormat> {
         val types: MutableList<BarcodeFormat> = mutableListOf()
 
@@ -212,4 +154,3 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         return types
     }
 }
-

@@ -16,6 +16,11 @@ Changes:
 - minSdk version on Android is now 18
 - `BarcodeScanner.scan()` returns a `ScanResult` object. Check [UPGRADE.md](./UPGRADE.md) for migration details.
 
+## v2.0.2 - 2020-04-14
+
+Bugfixes:
+- [Fixed the request camera permission flow on Android](https://github.com/mintware-de/flutter_barcode_reader/pull/186) - @devtronic
+
 ## v2.0.1 - 2020-02-19
 
 Bugfixes:

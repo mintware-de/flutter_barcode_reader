@@ -3,10 +3,11 @@ package de.mintware.barcode_scan
 import android.app.Activity
 import android.content.Intent
 import io.flutter.plugin.common.MethodChannel
+import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
 
-class ScanResultHandler(private val result: MethodChannel.Result) : ActivityResultHandler {
+class ScanResultHandler(private val result: MethodChannel.Result) : ActivityResultListener {
 
-    override fun handle(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
 
         var scanResult = ByteArray(0)
         when (resultCode) {

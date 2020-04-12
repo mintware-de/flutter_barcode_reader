@@ -11,15 +11,15 @@ import io.flutter.plugin.common.PluginRegistry.Registrar
 class BarcodeScanPlugin : FlutterPlugin, ActivityAware {
 
     @Nullable
-    private var methodCallHandler: MethodCallHandlerImpl? = null
+    private var channelHandler: ChannelHandler? = null
     @Nullable
     private var activityHelper: ActivityHelper? = null
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         activityHelper = ActivityHelper(flutterPluginBinding.applicationContext)
 
-        methodCallHandler = MethodCallHandlerImpl(activityHelper!!)
-        methodCallHandler!!.startListening(flutterPluginBinding.binaryMessenger)
+        channelHandler = ChannelHandler(activityHelper!!)
+        channelHandler!!.startListening(flutterPluginBinding.binaryMessenger)
     }
 
     // This static function is optional and equivalent to onAttachedToEngine. It supports the old
@@ -35,7 +35,7 @@ class BarcodeScanPlugin : FlutterPlugin, ActivityAware {
         @Suppress("unused")
         @JvmStatic
         fun registerWith(registrar: Registrar) {
-            val handler = MethodCallHandlerImpl(ActivityHelper(
+            val handler = ChannelHandler(ActivityHelper(
                     registrar.context(),
                     registrar.activity()
             ))
@@ -44,17 +44,17 @@ class BarcodeScanPlugin : FlutterPlugin, ActivityAware {
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
-        if (methodCallHandler == null) {
+        if (channelHandler == null) {
             return
         }
 
-        methodCallHandler!!.stopListening()
-        methodCallHandler = null
+        channelHandler!!.stopListening()
+        channelHandler = null
         activityHelper = null
     }
 
     override fun onDetachedFromActivity() {
-        if (methodCallHandler == null) {
+        if (channelHandler == null) {
             return
         }
 
@@ -66,10 +66,11 @@ class BarcodeScanPlugin : FlutterPlugin, ActivityAware {
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
-        if (methodCallHandler == null) {
+        if (channelHandler == null) {
             return
         }
         binding.addActivityResultListener(activityHelper!!)
+        binding.addRequestPermissionsResultListener(activityHelper!!)
         activityHelper!!.activity = binding.activity
     }
 
