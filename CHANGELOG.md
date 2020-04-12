@@ -12,6 +12,7 @@ Flexible configuration:
 
 **BREAKING CHANGES**:
 - minSdk version on Android is now 18
+- `BarcodeScanner.scan()` returns a `ScanResult` object. Check [UPGRADE.md](./UPGRADE.md) for migration details.
 
 ## v2.0.1 - 2020-02-19
 
