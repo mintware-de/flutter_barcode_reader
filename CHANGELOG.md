@@ -1,3 +1,11 @@
+## v3.0.0-dev.2 - 2020-04-12
+
+Migrated the changes of the 2.0.0 track 
+
+- Fixed the request camera permission flow on Android
+
+Updated also the Flutter env. SDK constraint to ">=2.1.0 <3.0.0" 
+
 ## v3.0.0-dev.1 - 2020-04-12
 
 Changes:
