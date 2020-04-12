@@ -8,7 +8,6 @@ import android.view.MenuItem
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
 
-
 class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     lateinit var scannerView: ZXingScannerView
@@ -30,7 +29,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val buttonText = if (it.flash) "Flash Off" else "Flash On"
+        val buttonText = if (scannerView.flash) "Flash Off" else "Flash On"
         val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
         return super.onCreateOptionsMenu(menu)
@@ -59,14 +58,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     override fun handleResult(result: Result?) {
         val intent = Intent()
         intent.putExtra("SCAN_RESULT", result.toString())
-        setResult(Activity.RESULT_OK, intent)
-        finish()
-    }
-
-    fun finishWithError(errorCode: String) {
-        val intent = Intent()
-        intent.putExtra("ERROR_CODE", errorCode)
-        setResult(Activity.RESULT_CANCELED, intent)
+        setResult(RESULT_OK, intent)
         finish()
     }
 }
