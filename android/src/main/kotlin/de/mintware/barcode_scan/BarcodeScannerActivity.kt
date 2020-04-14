@@ -16,8 +16,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     private lateinit var config: Protos.Configuration
-    lateinit var scannerView: ZXingScannerView
-    private var scannerViewInitialized: Boolean = false
+    private var scannerView: ZXingScannerView? = null
 
     companion object {
         const val TOGGLE_FLASH = 200
@@ -49,7 +48,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     private fun setupScannerView() {
-        if (scannerViewInitialized) {
+        if (scannerView != null) {
             return
         }
 
@@ -69,13 +68,12 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         }
 
         setContentView(scannerView)
-        scannerViewInitialized = true
     }
 
     // region AppBar menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         var buttonText = config.stringsMap["flash_on"]
-        if (scannerView.flash) {
+        if (scannerView?.flash == true) {
             buttonText = config.stringsMap["flash_off"]
         }
         val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
@@ -85,7 +83,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == TOGGLE_FLASH) {
-            scannerView.toggleFlash()
+            scannerView?.toggleFlash()
             this.invalidateOptionsMenu()
             return true
         }
@@ -94,14 +92,14 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     override fun onPause() {
         super.onPause()
-        scannerView.stopCamera()
+        scannerView?.stopCamera()
     }
 
     override fun onResume() {
         super.onResume()
         setupScannerView()
-        scannerView.setResultHandler(this)
-        scannerView.startCamera()
+        scannerView?.setResultHandler(this)
+        scannerView?.startCamera()
     }
     // endregion
 
