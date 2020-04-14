@@ -17,7 +17,6 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     private lateinit var config: Protos.Configuration
     lateinit var scannerView: ZXingScannerView
-    private var scannerViewInitialized: Boolean = false
 
     companion object {
         const val TOGGLE_FLASH = 200
@@ -49,7 +48,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     private fun setupScannerView() {
-        if (scannerViewInitialized) {
+        if (scannerView != null) {
             return
         }
 
@@ -69,7 +68,6 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         }
 
         setContentView(scannerView)
-        scannerViewInitialized = true
     }
 
     // region AppBar menu
