@@ -1,3 +1,8 @@
+## v3.0.0-dev.3 - 2020-04-14
+
+Bugfixes:
+- [App crash on orientation change](https://github.com/mintware-de/flutter_barcode_reader/pull/209) - @subinsv
+
 ## v3.0.0-dev.2 - 2020-04-12
 
 Migrated the changes of the 2.0.0 track 
