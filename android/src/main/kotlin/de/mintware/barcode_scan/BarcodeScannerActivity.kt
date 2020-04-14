@@ -48,7 +48,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     }
 
     private fun setupScannerView() {
-        if (scannerView != null) {
+        if (this::scannerView.isInitialized) {
             return
         }
 
@@ -73,7 +73,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
     // region AppBar menu
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         var buttonText = config.stringsMap["flash_on"]
-        if (scannerView.flash) {
+        if (this::scannerView.isInitialized && scannerView.flash) {
             buttonText = config.stringsMap["flash_off"]
         }
         val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
