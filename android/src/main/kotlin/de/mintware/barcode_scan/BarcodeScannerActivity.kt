@@ -20,6 +20,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
 
     companion object {
         const val TOGGLE_FLASH = 200
+        const val CANCEL = 300
         const val EXTRA_CONFIG = "config"
         const val EXTRA_RESULT = "scan_result"
         const val EXTRA_ERROR_CODE = "error_code"
@@ -78,6 +79,10 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         }
         val item = menu.add(0, TOGGLE_FLASH, 0, buttonText)
         item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
+        val item = menu.add(0, CANCEL, 0, config.stringsMap["cancel"])
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -86,6 +91,10 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
             scannerView?.toggleFlash()
             this.invalidateOptionsMenu()
             return true
+        }
+        if (item.itemId == CANCEL) {
+            setResult(RESULT_CANCELED)
+            finish()
         }
         return super.onOptionsItemSelected(item)
     }
