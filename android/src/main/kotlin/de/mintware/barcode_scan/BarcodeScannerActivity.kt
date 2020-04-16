@@ -95,6 +95,7 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         if (item.itemId == CANCEL) {
             setResult(RESULT_CANCELED)
             finish()
+            return true
         }
         return super.onOptionsItemSelected(item)
     }
