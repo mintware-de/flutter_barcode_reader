@@ -1,3 +1,10 @@
+# Upgrade from 2.x to 3.0.0
+
+The `BarcodeScan.scan()` method returns a [`ScanResult`](./lib/model/scan_result.dart).
+The barcode is stored in `ScanResult.rawContent`
+Check your calls to this method and read the barcode from the `rawContent` property.
+
+
 # Upgrade from 1.0.0 to 2.0.0
 
 The simples way for upgrading is by replacing:

@@ -1,0 +1,21 @@
+syntax = "proto3";
+package de.mintware.barcode_scan;
+import "android_configuration.proto";
+import "barcode_format.proto";
+
+message Configuration {
+    // Strings which are displayed to the user
+    map<string, string> strings = 1;
+
+    // Restricts the barcode format which should be read
+    repeated BarcodeFormat restrictFormat = 2;
+
+    // Index of the camera which should used. -1 uses the default camera
+    int32 useCamera = 3;
+
+    // Android specific configuration
+    AndroidConfiguration android = 4;
+
+    // Set to true to automatically enable flash on camera start
+    bool autoEnableFlash = 5;
+}

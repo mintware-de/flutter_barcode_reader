@@ -1,0 +1,15 @@
+syntax = "proto3";
+package de.mintware.barcode_scan;
+option java_package = "de.mintware.barcode_scan";
+
+message AndroidConfiguration {
+    // You can optionally set aspect ratio tolerance level
+    // that is used in calculating the optimal Camera preview size.
+    // On several Huawei devices you need to set this to 0.5.
+    // This parameter is only supported on Android devices.
+    double aspectTolerance = 1;
+
+    // Set to true to enable auto focus
+    // This parameter is only supported on Android devices.
+    bool useAutoFocus = 2;
+}
