@@ -1,6 +1,7 @@
 package de.mintware.barcode_scan
 
 import android.hardware.Camera
+import androidx.annotation.Keep
 import androidx.annotation.Nullable
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
@@ -20,6 +21,7 @@ class ChannelHandler(private val activityHelper: ActivityHelper
     @Nullable
     private var sink: EventChannel.EventSink? = null
 
+    @Keep
     @Suppress("unused", "UNUSED_PARAMETER")
     fun scan(call: MethodCall, result: MethodChannel.Result) {
         var config: Protos.Configuration = Protos.Configuration.newBuilder()
@@ -42,11 +44,13 @@ class ChannelHandler(private val activityHelper: ActivityHelper
         activityHelper.showScannerActivity(result, config)
     }
 
+    @Keep
     @Suppress("unused", "UNUSED_PARAMETER")
     fun numberOfCameras(call: MethodCall, result: MethodChannel.Result) {
         result.success(Camera.getNumberOfCameras())
     }
 
+    @Keep
     @Suppress("unused", "UNUSED_PARAMETER")
     fun requestCameraPermission(call: MethodCall, result: MethodChannel.Result) {
         result.success(activityHelper.requestCameraAccessIfNecessary(sink))
