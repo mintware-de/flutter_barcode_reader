@@ -1,3 +1,21 @@
+## v3.0.0 - 2020-04-18
+
+Bugfixes:
+- [Add @Keep annotation](https://github.com/mintware-de/flutter_barcode_reader/pull/214) to fix "No implementation for method requestCameraPermission" - @devtronic
+
+## v3.0.0-dev.3 - 2020-04-14
+
+Bugfixes:
+- [App crash on orientation change](https://github.com/mintware-de/flutter_barcode_reader/pull/209) - @subinsv
+
+## v3.0.0-dev.2 - 2020-04-12
+
+Migrated the changes of the 2.0.0 track 
+
+- Fixed the request camera permission flow on Android
+
+Updated also the Flutter env. SDK constraint to ">=2.1.0 <3.0.0" 
+
 ## v3.0.0-dev.1 - 2020-04-12
 
 Changes:
@@ -15,6 +33,11 @@ Changes:
 **BREAKING CHANGES**:
 - minSdk version on Android is now 18
 - `BarcodeScanner.scan()` returns a `ScanResult` object. Check [UPGRADE.md](./UPGRADE.md) for migration details.
+
+## v2.0.2 - 2020-04-14
+
+Bugfixes:
+- [Fixed the request camera permission flow on Android](https://github.com/mintware-de/flutter_barcode_reader/pull/186) - @devtronic
 
 ## v2.0.1 - 2020-02-19
 

@@ -1,19 +1,28 @@
 package de.mintware.barcode_scan
 
 import android.hardware.Camera
+import androidx.annotation.Keep
 import androidx.annotation.Nullable
 import io.flutter.plugin.common.BinaryMessenger
+import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import java.lang.reflect.Method
 
-class MethodCallHandlerImpl(private val activityHelper: ActivityHelper
-) : MethodChannel.MethodCallHandler {
+class ChannelHandler(private val activityHelper: ActivityHelper
+) : MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
 
     @Nullable
-    private var channel: MethodChannel? = null
+    private var methodChannel: MethodChannel? = null
 
-    @Suppress("unused")
+    @Nullable
+    private var eventChannel: EventChannel? = null
+
+    @Nullable
+    private var sink: EventChannel.EventSink? = null
+
+    @Keep
+    @Suppress("unused", "UNUSED_PARAMETER")
     fun scan(call: MethodCall, result: MethodChannel.Result) {
         var config: Protos.Configuration = Protos.Configuration.newBuilder()
                 .putAllStrings(mapOf(
@@ -35,28 +44,46 @@ class MethodCallHandlerImpl(private val activityHelper: ActivityHelper
         activityHelper.showScannerActivity(result, config)
     }
 
-    @Suppress("unused")
+    @Keep
+    @Suppress("unused", "UNUSED_PARAMETER")
     fun numberOfCameras(call: MethodCall, result: MethodChannel.Result) {
         result.success(Camera.getNumberOfCameras())
     }
 
+    @Keep
+    @Suppress("unused", "UNUSED_PARAMETER")
+    fun requestCameraPermission(call: MethodCall, result: MethodChannel.Result) {
+        result.success(activityHelper.requestCameraAccessIfNecessary(sink))
+    }
+
     fun startListening(messenger: BinaryMessenger?) {
-        if (channel != null) {
+        if (methodChannel != null) {
             stopListening()
         }
 
-        channel = MethodChannel(messenger, "de.mintware.barcode_scan").apply {
-            setMethodCallHandler(this@MethodCallHandlerImpl)
+        methodChannel = MethodChannel(messenger, "de.mintware.barcode_scan").apply {
+            setMethodCallHandler(this@ChannelHandler)
+        }
+
+        if (eventChannel != null) {
+            stopListening()
+        }
+
+        eventChannel = EventChannel(messenger, "de.mintware.barcode_scan/events").apply {
+            setStreamHandler(this@ChannelHandler)
         }
     }
 
     fun stopListening() {
-        if (channel == null) {
-            return
+        if (methodChannel != null) {
+            methodChannel!!.setMethodCallHandler(null)
+            methodChannel = null
         }
 
-        channel!!.setMethodCallHandler(null)
-        channel = null
+        if (eventChannel != null) {
+            eventChannel!!.setStreamHandler(null)
+            eventChannel = null
+        }
     }
 
     // region MethodCallHandler
@@ -96,6 +123,17 @@ class MethodCallHandlerImpl(private val activityHelper: ActivityHelper
         for (method in m) {
             methodMap[method.name] = method
         }
+    }
+    // endregion
+
+    // region StreamHandler
+
+    override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
+        sink = events
+    }
+
+    override fun onCancel(arguments: Any?) {
+        sink = null
     }
     // endregion
 }
