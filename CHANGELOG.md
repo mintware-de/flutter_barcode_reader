@@ -1,3 +1,8 @@
+## Next Version
+
+Features:
+- [Added cancel for ux](https://github.com/mintware-de/flutter_barcode_reader/pull/198) - @iRaySpace
+
 ## v3.0.0 - 2020-04-18
 
 Bugfixes:
