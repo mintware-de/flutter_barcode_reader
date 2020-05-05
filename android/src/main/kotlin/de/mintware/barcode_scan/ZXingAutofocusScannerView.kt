@@ -25,7 +25,7 @@ class ZXingAutofocusScannerView(context: Context) : ZXingScannerView(context) {
     }
 
     override fun setAutoFocus(state: Boolean) {
-        Log.e("oznecniV97", "autofocusPresence $autofocusPresence")
+        //Fix to avoid crash on devices without autofocus (Issue #226)
         if(autofocusPresence){
             super.setAutoFocus(callbackFocus)
         }
