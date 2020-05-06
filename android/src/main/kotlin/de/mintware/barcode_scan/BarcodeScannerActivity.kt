@@ -99,7 +99,11 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         super.onResume()
         setupScannerView()
         scannerView?.setResultHandler(this)
-        scannerView?.startCamera()
+        if (config.useCamera > -1) {
+            scannerView?.startCamera(config.useCamera)
+        } else {
+            scannerView?.startCamera()
+        }
     }
     // endregion
 
