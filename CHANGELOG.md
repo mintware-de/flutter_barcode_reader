@@ -1,3 +1,12 @@
+## v3.0.1 - 2020-05-08
+
+Features:
+- [Added cancel for ux](https://github.com/mintware-de/flutter_barcode_reader/pull/198) - @iRaySpace
+
+Bugfixes:
+- [Fix autofocus crash](https://github.com/mintware-de/flutter_barcode_reader/pull/228) - @oznecniV97
+- [Fix camera selection in Android](https://github.com/mintware-de/flutter_barcode_reader/pull/231) - @GabrieleVolpato
+
 ## v3.0.0 - 2020-04-18
 
 Bugfixes:
