@@ -5,6 +5,7 @@ Features:
 
 Bugfixes:
 - [Fix autofocus crash](https://github.com/mintware-de/flutter_barcode_reader/pull/228) - @oznecniV97
+- [Fix camera selection in Android](https://github.com/mintware-de/flutter_barcode_reader/pull/231) - @GabrieleVolpato
 
 ## v3.0.0 - 2020-04-18
 
