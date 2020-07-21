@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 
 import './model/model.dart';
 import 'gen/protos/protos.pb.dart' as proto;
@@ -12,6 +13,9 @@ import 'gen/protos/protos.pb.dart' as proto;
 class BarcodeScanner {
   /// If the user has granted the access to the camera this code is returned.
   static const cameraAccessGranted = 'PERMISSION_GRANTED';
+
+  /// If the device does not support camera access this code is returned.
+  static const cameraAccessNotSupported = 'CAMERA_ACCESS_NOT_SUPPORTED';
 
   /// If the user has not granted the access to the camera this code is thrown.
   static const cameraAccessDenied = 'PERMISSION_NOT_GRANTED';
@@ -32,7 +36,7 @@ class BarcodeScanner {
     ScanOptions options = const ScanOptions(),
   }) async {
     assert(options != null);
-    if (Platform.isIOS) {
+    if (kIsWeb || Platform.isIOS) {
       return _doScan(options);
     }
 

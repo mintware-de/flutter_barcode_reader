@@ -4,6 +4,9 @@ library jsqrscanner;
 import 'dart:async';
 import 'dart:html';
 import 'dart:js';
+import 'dart:typed_data';
+
+import 'package:barcode_scan/gen/protos/protos.pb.dart' as proto;
 
 import 'package:flutter/services.dart';
 import 'package:js/js.dart';
@@ -11,8 +14,10 @@ import 'package:js/js_util.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 class BarcodeScanPlugin {
-  Completer<String> _completer;
+  Completer<Uint8List> _completer;
   JsQRScanner _scanner;
+  int _useCamera = -1;
+  List<dynamic> _cameras = new List<dynamic>();
 
   static void registerWith(Registrar registrar) {
     final MethodChannel channel = MethodChannel(
@@ -24,7 +29,43 @@ class BarcodeScanPlugin {
     channel.setMethodCallHandler(instance.handleMethodCall);
   }
 
-  Future<String> handleMethodCall(MethodCall call) async {
+  Future<dynamic> handleMethodCall(MethodCall call) async {
+    switch (call.method) {
+      case "numberOfCameras": return getNumberOfCameras();
+      default: return callScan(call);
+    }
+  }
+
+  Future<int> getNumberOfCameras() {
+    Completer<int> completer = new Completer<int>();
+    _getCameras().then((cameras) => completer.complete(cameras.length));
+    return completer.future;
+  }
+
+  Future<Iterable<dynamic>> _getCameras() {
+    Completer<Iterable<dynamic>> completer = new Completer<Iterable<dynamic>>();
+    window.navigator.mediaDevices.enumerateDevices().then((devices) {
+      completer.complete(devices.where((device) => device.kind == 'videoinput'));
+    }).catchError((error) {
+      completer.complete([]);
+    });
+    return completer.future;
+  }
+
+  Future<Uint8List> callScan(MethodCall call) {
+    var config;
+    if (call.arguments is Uint8List) {
+      var buffer = call.arguments as Uint8List;
+      config = proto.Configuration.fromBuffer(buffer);
+    } else {
+      config = proto.Configuration()
+        ..useCamera = -1;
+    }
+    return scan(config);
+  }
+
+  Future<Uint8List> scan(proto.Configuration config) {
+    _useCamera = config.useCamera;
     _ensureMediaDevicesSupported();
     _createCSS();
     var script = document.createElement('script');
@@ -34,7 +75,7 @@ class BarcodeScanPlugin {
     _createHTML();
     document.querySelector('#toolbar p').addEventListener('click', (event) => _onCloseByUser());
     setProperty(window, 'JsQRScannerReady', allowInterop(this.scannerReady));
-    _completer = new Completer<String>();
+    _completer = new Completer<Uint8List>();
     return _completer.future;
   }
 
@@ -42,7 +83,7 @@ class BarcodeScanPlugin {
     if (window.navigator.mediaDevices == null) {
       throw PlatformException(
         code: 'CAMERA_ACCESS_NOT_SUPPORTED',
-        message: "Camera access not supported by browser2"
+        message: "Camera access not supported by browser"
       );
     }
   }
@@ -79,7 +120,11 @@ class BarcodeScanPlugin {
 
   void onQRCodeScanned(String scannedText) {
     if (!_completer.isCompleted) {
-      _completer.complete(scannedText);
+      var scanResult = proto.ScanResult()
+        ..type = proto.ResultType.Barcode
+        ..format = proto.BarcodeFormat.qr
+        ..rawContent = scannedText;
+      _completer.complete(scanResult.writeToBuffer());
       _close();
     }
   }
@@ -101,14 +146,24 @@ class BarcodeScanPlugin {
   }
 
   void scannerReady() {
-    _scanner = JsQRScanner(allowInterop(this.onQRCodeScanned), allowInterop(this.provideVideo));
-    _scanner.setSnapImageMaxSize(300);
-    var scannerParentElement = document.getElementById('scanner');
-    _scanner.appendTo(scannerParentElement);
+    window.navigator.getUserMedia(video: true).then((stream) {
+      window.navigator.mediaDevices.enumerateDevices().then((devices) {
+        _cameras = devices.where((device) => device.kind == 'videoinput').toList();
+        _scanner = JsQRScanner(allowInterop(this.onQRCodeScanned), allowInterop(this.provideVideo));
+        _scanner.setSnapImageMaxSize(300);
+        var scannerParentElement = document.getElementById('scanner');
+        _scanner.appendTo(scannerParentElement);
+      }).catchError((onError) => _reject(onError));
+    }).catchError((onError) => _reject(onError));
   }
 
   Promise<MediaStream> provideVideo() {
-    var videoPromise = getUserMedia(new UserMediaOptions(video: new VideoOptions(facingMode: 'environment')));
+    var videoPromise;
+    if (_useCamera < 0) {
+      videoPromise = getUserMedia(new UserMediaOptions(video: new VideoOptions(facingMode: 'environment')));
+    } else {
+      videoPromise = getUserMedia(new UserMediaOptions(video: new VideoOptions(deviceId: new DeviceIdOptions(exact: _cameras[_useCamera].deviceId))));
+    }
     videoPromise.then(null, allowInterop(_reject));
     return videoPromise;
   } 
@@ -137,8 +192,17 @@ class UserMediaOptions {
 @anonymous
 class VideoOptions {
   external String get facingMode;
+  external DeviceIdOptions get deviceId;
 
-  external factory VideoOptions({ String facingMode });
+  external factory VideoOptions({ String facingMode = null, DeviceIdOptions deviceId = null });
+}
+
+@JS()
+@anonymous
+class DeviceIdOptions {
+  external String get exact;
+
+  external factory DeviceIdOptions({ String exact });
 }
 
 @JS()
