@@ -81,10 +81,7 @@ class BarcodeScanPlugin {
 
   void _ensureMediaDevicesSupported() {
     if (window.navigator.mediaDevices == null) {
-      throw PlatformException(
-        code: 'CAMERA_ACCESS_NOT_SUPPORTED',
-        message: "Camera access not supported by browser"
-      );
+      _completeWithError('CAMERA_ACCESS_NOT_SUPPORTED');
     }
   }
 
@@ -124,17 +121,14 @@ class BarcodeScanPlugin {
         ..type = proto.ResultType.Barcode
         ..format = proto.BarcodeFormat.qr
         ..rawContent = scannedText;
-      _completer.complete(scanResult.writeToBuffer());
-      _close();
+      _completeWithResult(scanResult);
     }
   }
 
   void _onCloseByUser() {
-    _close();
-    _completer.completeError(PlatformException(
-      code: 'USER_CANCELED',
-      message: 'User closed the scan window'
-    ));
+    var scanResult = proto.ScanResult()
+      ..type = proto.ResultType.Cancelled;
+    _completeWithResult(scanResult);
   }
 
   void _close() {
@@ -169,10 +163,19 @@ class BarcodeScanPlugin {
   } 
 
   void _reject(reject) {
-    _completer.completeError(PlatformException(
-      code: 'PERMISSION_NOT_GRANTED',
-      message: 'Permission to access the camera not granted'
-    ));
+    _completeWithError('PERMISSION_NOT_GRANTED');
+  }
+
+  void _completeWithError(String errorCode) {
+    var scanResult = proto.ScanResult()
+      ..type = proto.ResultType.Error
+      ..format = proto.BarcodeFormat.unknown
+      ..rawContent = errorCode;
+    _completeWithResult(scanResult);
+  }
+
+  void _completeWithResult(proto.ScanResult scanResult) {
+    _completer.complete(scanResult.writeToBuffer());
     _close();
   }
 }
