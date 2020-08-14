@@ -121,8 +121,8 @@ void main() async {
 | `restrictFormat`           | `BarcodeFormat[]` | Restrict the formats which are recognized                                                 | iOS + Android |
 | `useCamera`                | `int`             | The index of the camera which is used for scanning (See `BarcodeScanner.numberOfCameras`) | iOS + Android |
 | `autoEnableFlash`          | `bool`            | Enable the flash when start scanning                                                      | iOS + Android |
-| `android.aspectTolerance`  | `double`          | Enable the flash when start scanning                                                      | Android only  |
-| `android.useAutoFocus`     | `bool`            | Enable the flash when start scanning                                                      | Android only  |
+| `android.aspectTolerance`  | `double`          | Enable auto focus on Android                                                              | Android only  |
+| `android.useAutoFocus`     | `bool`            | Set aspect ratio tolerance level used in calculating the optimal Camera preview size      | Android only  |
 
 ## Development setup
 
