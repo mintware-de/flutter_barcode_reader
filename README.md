@@ -152,3 +152,20 @@ If you changed the protos.proto you've to execute the ./generate_proto.sh to upd
 ### Android "Could not find org.jetbrains.kotlin:kotlin-stdlib-jre..."
 Change `org.jetbrains.kotlin:kotlin-stdlib-jre` to `org.jetbrains.kotlin:kotlin-stdlib-jdk`
 ([StackOverflow](https://stackoverflow.com/a/53358817))
+
+
+### Customizing Scanning Screen
+
+#### Title in Appbar at top [Android]
+
+Open up : android/app/src/main/**AndroidManifest.xml
+
+After `</activity>` closing tag add following:
+```xml
+<activity 
+     android:name="de.mintware.barcode_scan.BarcodeScannerActivity"
+     android:label="My Activity Title" />
+```
+(Replace "My Activity Title" with your desired title)
+
+
