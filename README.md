@@ -28,7 +28,7 @@ For Android, you must do the following before you can use the plugin:
      
      `<uses-permission android:name="android.permission.CAMERA" />`
 
-* This plugin is written in Kotlin. Therefore, you need to add Kotlin support to your project. See [installing the Kotlin plugin](https://kotlinlang.org/docs/tutorials/kotlin-android.html#installing-the-kotlin-plugin).
+* This plugin is written in Kotlin. Therefore, you need to add Kotlin support to your project. See [installing the Kotlin plugin](https://developer.android.com/kotlin/add-kotlin).
 
 Edit your project-level build.gradle file to look like this:
 ```groovy
@@ -38,6 +38,7 @@ buildscript {
     dependencies {
         // ...
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.12'
     }
 }
 // ...
