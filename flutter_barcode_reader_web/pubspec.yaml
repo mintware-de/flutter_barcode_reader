@@ -1,0 +1,33 @@
+name: barcode_scan_web
+description: A flutter plugin for scanning 2D barcodes and QRCodes via camera.
+version: 2.0.1
+homepage: https://github.com/mintware-de/flutter_barcode_reader
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+  js: ^0.6.0
+  barcode_scan:
+    path: ../ 
+
+environment: 
+  sdk: ">=2.0.0-dev.58.0 <3.0.0" 
+  flutter: ^1.10.0
+
+flutter:
+  plugin:
+    platforms:
+      web:
+        pluginClass: BarcodeScanPlugin
+        fileName: barcode_web.dart
+  assets:
+    - assets/jsqrscanner.nocache.js
+    - assets/9F36F6E596D24028CF2BAC1860F22428.cache.js
+    - assets/583759B3547F41A4DB81ABD2A010247E.cache.js
+    - assets/7336332C96BEE798552E9397E317C8AC.cache.js
+    - assets/compilation-mappings.txt
+    - assets/B740E7E455C035DF151FA9FBFC08D197.cache.js
+    - assets/E2DE619934E7B85CBFB9935ADFC149FD.cache.js
+    - assets/styles.css
