@@ -1,8 +1,11 @@
 # Upgrade from 2.x to 3.0.0
 
-The `BarcodeScan.scan()` method returns a [`ScanResult`](./lib/model/scan_result.dart).
-The barcode is stored in `ScanResult.rawContent`
-Check your calls to this method and read the barcode from the `rawContent` property.
+- The `BarcodeScan.scan()` method returns a [`ScanResult`](./lib/model/scan_result.dart).
+  The barcode is stored in `ScanResult.rawContent`
+  Check your calls to this method and read the barcode from the `rawContent` property.
+- The following static strings of class `BarcodeScanner` are now written in camelCase (as opposed to PascalCase like before):
+  - `cameraAccessGranted`
+  - `cameraAccessDenied`
 
 If your project uses pre Flutter 1.12 you need to update Flutter in your App: https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects
 
