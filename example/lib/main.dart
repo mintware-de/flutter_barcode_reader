@@ -252,9 +252,11 @@ class _MyAppState extends State<_MyApp> {
         useCamera: _selectedCamera,
         autoEnableFlash: _autoEnableFlash,
         android: AndroidOptions(
-          aspectTolerance: _aspectTolerance,
-          useAutoFocus: _useAutoFocus,
-        ),
+            aspectTolerance: _aspectTolerance,
+            useAutoFocus: _useAutoFocus,
+            title: "Flutter Barcode Reader",
+            statusbarColor: "#e67e22",
+            actionBarColor: "#f1c40f"),
       );
 
       var result = await BarcodeScanner.scan(options: options);

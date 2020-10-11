@@ -2,9 +2,13 @@ package de.mintware.barcode_scan
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.Result
 import me.dm7.barcodescanner.zxing.ZXingScannerView
@@ -46,6 +50,34 @@ class BarcodeScannerActivity : Activity(), ZXingScannerView.ResultHandler {
         super.onCreate(savedInstanceState)
 
         config = Protos.Configuration.parseFrom(intent.extras!!.getByteArray(EXTRA_CONFIG))
+        title = config.android.title ?: ""
+
+        val statusBarColor = try {
+            Color.parseColor(config.android.statusbarColor)
+        } catch (e: IllegalArgumentException) {
+            Int.MAX_VALUE
+        } catch (e: StringIndexOutOfBoundsException) {
+            Int.MAX_VALUE
+        }
+        val actionBarColor = try {
+            Color.parseColor(config.android.actionBarColor)
+        } catch (e: IllegalArgumentException) {
+            Int.MIN_VALUE
+        } catch (e: StringIndexOutOfBoundsException) {
+            Int.MIN_VALUE
+        }
+
+        if (statusBarColor !=  Int.MAX_VALUE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window?.let {
+                it.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+                it.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+                it.statusBarColor = statusBarColor
+            }
+        }
+        if (actionBarColor != Int.MIN_VALUE) {
+            actionBar?.setBackgroundDrawable(ColorDrawable(actionBarColor))
+        }
+
     }
 
     private fun setupScannerView() {

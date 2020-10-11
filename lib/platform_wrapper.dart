@@ -72,6 +72,9 @@ class BarcodeScanner {
           ..android = (proto.AndroidConfiguration()
                 ..useAutoFocus = options.android.useAutoFocus
                 ..aspectTolerance = options.android.aspectTolerance
+                ..title = options.android.title
+                ..statusbarColor = options.android.statusbarColor
+                ..actionBarColor = options.android.actionBarColor
               /**/)
         /**/;
     var buffer = await _channel.invokeMethod('scan', config?.writeToBuffer());

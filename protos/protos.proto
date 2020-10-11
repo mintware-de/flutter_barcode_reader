@@ -15,6 +15,15 @@ message AndroidConfiguration {
     // Set to true to enable auto focus
     // This parameter is only supported on Android devices.
     bool useAutoFocus = 2;
+    /// Change the title of activities
+    /// This parameter is only supported on Android devices.
+    string title = 3;
+    /// Set statusbar color
+    /// This parameter is only supported on Android devices.
+    string statusbarColor = 4;
+    /// Set actionBar color
+    /// This parameter is only supported on Android devices.
+    string actionBarColor = 5;
 }
 
 // protos/barcode_format.proto
